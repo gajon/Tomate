@@ -1,0 +1,265 @@
+/* Global Styles {{{1 */
+
+body {
+	color: #333;
+	background: #fff;
+	font: normal 75% 'Trebuchet MS',Verdana,Helvetica,sans-serif;
+	line-height: 1.6;
+}
+
+a { color: #00f; text-decoration: none; }
+a:focus, a:hover { color: #f00; text-decoration: underline; }
+
+h1 { text-shadow: 2px 2px 2px #ccc; }
+
+td,th {
+	padding: 0 0.5em;
+}
+
+small { font-size: 80% }
+
+.left { float:left; }
+.right { float:right; }
+.text-center { text-align:center; }
+
+.hidden { display:none; }
+
+
+/* Body Container {{{1 */
+
+#body-container {
+	margin: 0 auto;
+	padding: 0;
+	width: 756px;
+}
+
+/* Navigation {{{1 */
+
+nav {
+	float:left;
+	width:100%;
+	background:#DAE0D2 url("banner2.jpg") repeat-x bottom;
+	line-height:normal;
+}
+
+nav ul {
+	margin:0;
+	padding:66px 10px 0;
+	list-style:none;
+}
+
+nav li {
+	float:left;
+	background:url("left.gif") no-repeat left top;
+	margin:0;
+	padding:0 0 0 9px;
+}
+
+nav a, nav strong, nav span {
+	display:block;
+	background:url("right.gif") no-repeat right top;
+	padding:5px 15px 4px 6px;
+	text-decoration:none;
+	color:#666;
+}
+nav a:hover {
+	color:#333;
+}
+
+nav #current {
+	background-image:url("left_on.gif");
+}
+
+nav #current a {
+	background-image:url("right_on.gif");
+	padding-bottom:5px;
+	color:#000;
+}
+
+nav li.notab, nav li.notab a, nav li.notab span {
+	background:none !important;
+	color: #000;
+}
+nav li.notab a {
+	color: #00f; text-decoration: none;
+}
+nav li.notab a:focus, nav li.notab a:hover {
+	color: #f00; text-decoration: underline;
+}
+
+
+/* Content {{{1 */
+
+#content {
+	clear: both;
+}
+
+/* Section {{{1 */
+
+#content section {
+	margin-bottom: 2em;
+}
+
+#content section h1 {
+	font-size: 1.3em;
+	text-shadow: 1px 1px 1px #ccc;
+}
+
+/* ------------------------------------------
+ * Day navigation
+ * ------------------------------------------ */
+#day-navigation {
+	float: left;
+	width: 100%;
+	margin-top: 1em !important;
+}
+
+#day-navigation #location span {
+	font-size: 0.8em;
+	padding-left: 2em;
+}
+
+#day-navigation #location {
+	float:left;
+	width: 60%;
+	text-align:center;
+}
+
+#day-navigation #previousday {
+	float: left;
+	width: 20%;
+	line-height: 3em;
+}
+
+#day-navigation #nextday {
+	float: left;
+	width: 20%;
+	text-align:right;
+	line-height: 3em;
+}
+
+/* ------------------------------------------
+ * Listing of tasks
+ * ------------------------------------------ */
+
+section.listing {
+	clear: both;
+}
+
+section.listing header {
+	line-height: 1.3em;
+	margin-bottom: 1em !important;
+}
+
+section.listing table {
+	clear: both;
+	width: 100%;
+}
+
+section.listing .task-name {
+	line-height: 1.0em;
+	padding-top: 0.4em;
+}
+section.listing .task-tags {
+	color: #080;
+	font-style: italic;
+	line-height: 1.0em;
+	padding-bottom: 0.4em;
+}
+
+section.listing span.edit {
+	padding-left: 1em;
+}
+
+section.listing td { vertical-align:middle; }
+section.listing tfoot th { text-align:center; }
+section.listing tfoot th:first-child { text-align:left !important; }
+
+.highlight { background-color: #faffc5 !important; }
+
+/* ------------------------------------------
+ * Add new record
+ * ------------------------------------------ */
+
+.add-task input {
+	padding: 4px;
+	margin: 2px 4px;
+	background-color: #fff;
+	border: 1px solid #8dbdd8;
+}
+
+.add-task input.focused {
+	font-style:normal;
+	color:#000;
+}
+.add-task input.idle {
+	font-style:italic;
+	color:#6f6f6f;
+}
+
+.add-task #id_task {
+	width: 203px;
+}
+.add-task #id_estimations {
+	width: 96px;
+}
+.add-task #id_real {
+	width: 48px;
+}
+.add-task #id_tags {
+	width: 383px;
+}
+.add-task #id_submit {
+	margin-left: 4px;
+}
+
+
+/* ------------------------------------------
+ * Login form
+ * ------------------------------------------ */
+
+#login {
+	width: 500px;
+	margin: 100px auto;
+	border: 1px solid #e6eeee;
+	padding: 2em 0;
+}
+
+#login div {
+	clear: left;
+	display: block;
+	zoom: 1;
+	margin: 5px 0 0 0;
+	padding: 1px 3px;
+}
+
+#login label {
+	display: block;
+	float: left;
+	font-weight: bold;
+	width: 140px;
+	padding: 4px 5px;
+	margin: 1px 0;
+	text-align: right;
+}
+
+#login div input {
+	padding: 4px;
+	margin: 2px 4px;
+	background-color: #fff;
+	border: 1px solid #8dbdd8;
+	width: 200px;
+}
+
+#login div button {
+	margin-left: 154px;
+}
+
+
+/* Footer {{{1 */
+
+footer {
+}
+
+
+/* vim: set sw=4 ts=4 noet foldmethod=marker: */
