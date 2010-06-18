@@ -53,13 +53,18 @@
                                      ',name)
            *dispatch-table*)))
 
-;;; TODO: there should be a way to combine this into a single macro
+;;; TODO: there should be a way to combine these `define-*-fn` macros
+;;;       into a single one.
 (defmacro define-open-url-fn (name &body body)
   "This macro is like `define-url-fn` macro but does not try to see
-  if there's a valid session."
+if there's a valid session. The variables `the-user` and `time-zone` are
+still being inserted into the lexical context but their values are nil.
+BE CAREFUL."
   `(progn
      (defun ,name ()
-       ,@body)
+       (let (the-user time-zone)
+         (declare (ignorable the-user time-zone))
+         ,@body))
      (push (create-prefix-dispatcher ,(format nil "/~(~a~)/" name) ',name)
            *dispatch-table*)))
 
@@ -67,41 +72,25 @@
   (let ((index-fn (gensym)))
     `(progn
        (defun ,index-fn ()
-         ,@body)
+         (let (the-user time-zone)
+           (declare (ignorable the-user time-zone))
+           ,@body))
        (setf hunchentoot::*default-handler* #',index-fn))))
 
-;;; TODO: We are repeating most of the code here and in `standard-page`.
-;;; TODO: Ideally, we should be able to parameterize this macro so that
-;;;       we can link to different JavaScript and CSS files.
-(defmacro login-page (&body body)
-  `(with-html-output-to-string (*standard-output* nil :prologue t :indent nil)
-     (:html
-       (:head
-         (:meta :charset "utf-8")
-         (:title "Login")
-         (:link :type "text/css"
-                :rel "stylesheet"
-                :media "screen, projection"
-                :href "/static/css/html5reset-1.4.1.css")
-         (:link :type "text/css"
-                :rel "stylesheet"
-                :media "screen, projection"
-                :href "/static/css/styles.css")
-         (:script :type "text/javascript" :src "/static/js/jquery-1.4.2.min.js")
-         (:script :type "text/javascript" :src "/static/js/login.js")
-         "<!--[if IE]><script src=\"http://html5shiv.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->")
-       (:body
-         (:div :id "body-container"
-               (:div :id "content"
-                     ,@body))))))
 
 ;;; CAUTION, We expect to capture the free variable `the-user`.
-(defmacro standard-page ((&key title) &body body)
+(defmacro standard-page ((&key (title "")
+                               (show-banner t)
+                               css-files js-files)
+                         &body body)
   `(with-html-output-to-string (*standard-output* nil :prologue t :indent nil)
      (:html
        (:head
          (:meta :charset "utf-8")
          (:title (esc ,title))
+         ;;
+         ;; CSS files
+         ;;
          (:link :type "text/css"
                 :rel "stylesheet"
                 :media "screen, projection"
@@ -110,25 +99,32 @@
                 :rel "stylesheet"
                 :media "screen, projection"
                 :href "/static/css/styles.css")
+         ,@(mapcar (lambda (file)
+                     `(:link :type "text/css" :rel "stylesheet"
+                             :media "screen, projection"
+                             :href ,(format nil"/static/css/~a" file)))
+                   css-files)
+         ;;
+         ;; JavaScript files
+         ;;
          (:script :type "text/javascript" :src "/static/js/jquery-1.4.2.min.js")
-         (:script :type "text/javascript" :src "/static/js/code.js")
-         (:script :type "text/javascript" :src "/static/js/jquery.tablesorter.min.js")
-         (:link :type "text/css"
-                :rel "stylesheet"
-                :media "screen, projection"
-                :href "/static/css/tablesorter/blue/style.css")
+         ,@(mapcar (lambda (file)
+                     `(:script :type "text/javascript"
+                               :src ,(format nil "/static/js/~a" file)))
+                   js-files)
          "<!--[if IE]><script src=\"http://html5shiv.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->")
        (:body
          (:div :id "body-container"
-           (:header :role "banner" :class "banner"
-             (:nav
-               (:ul (:li :id "current" (:a :href "/listing/" "Listings"))
-                    (:li (:a :href "/reports/" "Reports"))
-                    (:li (:a :href "/account/" "Account"))
-                    (:li :class "notab"
-                         (:span "Welcome "
-                                (esc (user-full-name the-user))))
-                    (:li :class "notab" (:a :href "/logout/" "Logout")))))
+           ,(when show-banner
+              `(:header :role "banner" :class "banner"
+                 (:nav
+                   (:ul (:li :id "current" (:a :href "/listing/" "Listings"))
+                        (:li (:a :href "/reports/" "Reports"))
+                        (:li (:a :href "/account/" "Account"))
+                        (:li :class "notab"
+                             (:span "Welcome "
+                                    (esc (user-full-name the-user))))
+                        (:li :class "notab" (:a :href "/logout/" "Logout"))))))
            (:div :id "content"
                  ,@body)
            (:footer

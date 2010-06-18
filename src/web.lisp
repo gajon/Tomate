@@ -81,8 +81,12 @@
         (setf (session-value 'authenticated) nil))))
   (when (string= (session-value 'authenticated) "yes")
     (redirect "/listing/"))
+  ;;
   ;; Render login form
-  (login-page
+  ;;
+  (standard-page (:title "Login"
+                  :show-banner nil
+                  :js-files ("login.js"))
     (:section :id "login"
       (:form :method "post" :action "."
              (hidden-input "timezone")
@@ -108,9 +112,8 @@
               (session-value 'username) (user-username new-user)
               (session-value 'timezone) (user-time-zone new-user))
         (redirect "/listing/"))))
-  ;; TODO: we need a more general macro than `login-page`, and supply an
-  ;; appropriate title.
-  (login-page
+  (standard-page (:title "Create a new account"
+                  :show-banner nil)
     (:section :id "register"
       (:h1 "Create a new account:")
       (:form :method "post" :action "."
@@ -163,7 +166,9 @@
          (yesterday (- today %secs-in-one-day))
          (tomorrow (+ today %secs-in-one-day))
          (tasks (get-tasks-by-date today time-zone the-user)))
-    (standard-page (:title "Listing of tasks recorded")
+    (standard-page (:title "Listing of recorded tasks"
+                    :css-files ("tablesorter/blue/style.css")
+                    :js-files ("code.js" "jquery.tablesorter.min.js"))
       ;;
       ;; DAY NAVIGATION: displays the date, location and links to
       ;; go to the previous/next day.
