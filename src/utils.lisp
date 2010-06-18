@@ -140,7 +140,7 @@
   (let* ((name (escape-string name))
          (label (escape-string label))
          (id (format nil "id_~a" name))
-         (default-value (or (post-parameter name)
+         (default-value (or (escape-string (post-parameter name))
                             (escape-string default-value))))
     (with-html-output (*standard-output*)
       (when label
@@ -164,7 +164,7 @@
 (defun hidden-input (name &key default-value)
   (let* ((name (escape-string name))
          (id (format nil "id_~a" name))
-         (default-value (or (post-parameter name)
+         (default-value (or (escape-string (post-parameter name))
                             (escape-string default-value))))
     (with-html-output (*standard-output*)
       (:input :type "hidden"

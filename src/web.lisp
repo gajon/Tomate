@@ -182,7 +182,7 @@
 (define-url-fn add-new-task
   ;; Validate, create new object and redirect.
   (when (process-add-new-task the-user time-zone)
-    (redirect (format nil "/listing/?d=~d" (post-parameter "d"))))
+    (redirect (format nil "/listing/?d=~d" (url-encode (post-parameter "d")))))
   ;; Display form.
   ;; TODO: What if there's no "d" post parameter?
   (standard-page (:title "Add new record")
