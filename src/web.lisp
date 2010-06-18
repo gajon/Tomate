@@ -88,12 +88,66 @@
              (hidden-input "timezone")
              (:div (text-input "Username:" "username"))
              (:div (password-input "Password:" "password"))
-             (:div (submit-button "Login"))))))
+             (:div (submit-button "Login"))
+             (:div (:a :href "/register/"
+                       :class "new-account" "New account?"))))))
 
 (define-url-fn logout
   (setf (session-value 'authenticated) nil
         (session-value 'username) "")
   (redirect "/"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; CREATE NEW ACCOUNT
+
+(define-open-url-fn register
+  (when (eql :post (request-method*))
+    (let ((new-user (process-register-new-account)))
+      (when new-user
+        (setf (session-value 'authenticated) "yes"
+              (session-value 'username) (user-username new-user)
+              (session-value 'timezone) (user-time-zone new-user))
+        (redirect "/listing/"))))
+  ;; TODO: we need a more general macro than `login-page`, and supply an
+  ;; appropriate title.
+  (login-page
+    (:section :id "register"
+      (:h1 "Create a new account:")
+      (:form :method "post" :action "."
+        (hidden-input "timezone")
+        (:div (text-input "Username:" "username"))
+        (:div (:p "Your username can be anything, your email, numbers, whatever,
+                  but beginning and ending whitespace will be removed."))
+        (:div (text-input "Full name:" "full-name"))
+        (:div (:p "This is optional, you can enter whatever you want.
+                  It will appear on the heading of your list of tasks."))
+        (:div (text-input "Location:" "current-location"))
+        (:div (:p "Optional. The Pomodoro Technique encourages you to also
+                  record the place you were in when you did your work."))
+        (:div (password-input "Password:" "password"))
+        (:div (password-input "Re-type:" "password2"))
+        (:div (submit-button "Create")
+              (:a :href "/" "go back"))))))
+
+(defun process-register-new-account ()
+  (let ((username (trim-or-nil (post-parameter "username")))
+        (full-name (trim-or-nil (post-parameter "full-name")))
+        (location (trim-or-nil (post-parameter "current-location")))
+        (password (trim-or-nil (post-parameter "password")))
+        (password2 (trim-or-nil (post-parameter "password2")))
+        (timezone (parse-int-force-pos-or-zero
+                    (trim-or-nil (post-parameter "timezone")))))
+    (when (and username password password2
+               (and (string= password password2)))
+      (add-user
+        (make-instance 'user
+                       :username username
+                       :full-name (or full-name "")
+                       :password-digest (hunchentoot::md5-hex password)
+                       :email ""
+                       :current-location (or location "")
+                       :time-zone timezone)))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; LISTING

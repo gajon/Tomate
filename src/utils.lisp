@@ -53,6 +53,16 @@
                                      ',name)
            *dispatch-table*)))
 
+;;; TODO: there should be a way to combine this into a single macro
+(defmacro define-open-url-fn (name &body body)
+  "This macro is like `define-url-fn` macro but does not try to see
+  if there's a valid session."
+  `(progn
+     (defun ,name ()
+       ,@body)
+     (push (create-prefix-dispatcher ,(format nil "/~(~a~)/" name) ',name)
+           *dispatch-table*)))
+
 (defmacro define-index-fn (&body body)
   (let ((index-fn (gensym)))
     `(progn
@@ -61,6 +71,8 @@
        (setf hunchentoot::*default-handler* #',index-fn))))
 
 ;;; TODO: We are repeating most of the code here and in `standard-page`.
+;;; TODO: Ideally, we should be able to parameterize this macro so that
+;;;       we can link to different JavaScript and CSS files.
 (defmacro login-page (&body body)
   `(with-html-output-to-string (*standard-output* nil :prologue t :indent nil)
      (:html

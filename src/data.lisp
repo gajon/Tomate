@@ -135,7 +135,11 @@ a little bit:
       (:|tags| . ,(task-tags task))
       (:|estimations| . ,(task-estimations task))
       (:|real| . ,(task-real task))
-      (:|user| . ,(user-username the-user)))))
+      (:|user| . ,(user-username the-user))))
+  ;; TODO: and (:|ok| . T)
+  ;; TODO: fetch the task from the database or simply
+  ;; set the _rev field?
+  task)
 
 (defun update-task (task the-user)
   (clouchdb:put-document
@@ -147,7 +151,22 @@ a little bit:
       (:|tags| . ,(task-tags task))
       (:|estimations| . ,(task-estimations task))
       (:|real| . ,(task-real task))
-      (:|user| . ,(user-username the-user)))))
+      (:|user| . ,(user-username the-user))))
+  task)
+
+(defun add-user (the-user)
+  (clouchdb:create-document
+    `((:|type| . "user")
+      (:|password| . ,(user-password-digest the-user))
+      (:|full-name| . ,(user-full-name the-user))
+      (:|email| . ,(user-email the-user))
+      (:|current-location| . ,(user-current-location the-user))
+      (:|time-zone| . ,(user-time-zone the-user)))
+    :id (user-username the-user))
+  ;; TODO: and (:|ok| . T)
+  ;; TODO: fetch the user from the database or simply
+  ;; set the _rev field?
+  the-user)
 
 (defun update-user (the-user)
   ;; For User documents, the username is the _id of the document.
@@ -159,7 +178,8 @@ a little bit:
       (:|full-name| . ,(user-full-name the-user))
       (:|email| . ,(user-email the-user))
       (:|current-location| . ,(user-current-location the-user))
-      (:|time-zone| . ,(user-time-zone the-user)))))
+      (:|time-zone| . ,(user-time-zone the-user))))
+  the-user)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; UTILITIES TO SETUP THE COUCHDB DATABASE, MAINLY THE

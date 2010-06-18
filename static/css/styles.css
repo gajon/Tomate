@@ -208,7 +208,7 @@ section.listing tfoot th:first-child { text-align:left !important; }
 }
 
 
-/* Login form {{{1 */
+/* Login and Register forms {{{1 */
 
 #login {
 	width: 500px;
@@ -216,16 +216,18 @@ section.listing tfoot th:first-child { text-align:left !important; }
 	border: 1px solid #e6eeee;
 	padding: 2em 0;
 }
-
-#login div {
+#register {
+	width: 500px;
+	margin: 2em auto;
+}
+#login div, #register div {
 	clear: left;
 	display: block;
 	zoom: 1;
 	margin: 5px 0 0 0;
 	padding: 1px 3px;
 }
-
-#login label {
+#login label, #register label {
 	display: block;
 	float: left;
 	font-weight: bold;
@@ -234,18 +236,21 @@ section.listing tfoot th:first-child { text-align:left !important; }
 	margin: 1px 0;
 	text-align: right;
 }
-
-#login div input {
+#login input, #register input {
 	padding: 4px;
 	margin: 2px 4px;
 	background-color: #fff;
 	border: 1px solid #8dbdd8;
 	width: 200px;
 }
-
-#login div button {
+#login button, #login a.new-account,
+#register button, #register p {
 	margin-left: 154px;
 }
+#register p { font-size: 90%; }
+#register a { margin-left: 2em; }
+#register h1 { font-size: 2em !important; margin-bottom: 1em; }
+
 
 /* Account settings {{{1 */
 
