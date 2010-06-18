@@ -116,8 +116,11 @@ a little bit:
 
 (defun build-user-from-alist (alist)
   (make-instance 'user
+                 :rev (%couchdb-field '_rev alist)
                  :full-name (%couchdb-field 'full-name alist)
                  :username (%couchdb-field '_id alist)
+                 :password-digest (%couchdb-field 'password alist)
+                 :email (%couchdb-field 'email alist)
                  :current-location (%couchdb-field 'current-location alist)
                  :time-zone (%couchdb-field 'time-zone alist)))
 
@@ -146,6 +149,17 @@ a little bit:
       (:|real| . ,(task-real task))
       (:|user| . ,(user-username the-user)))))
 
+(defun update-user (the-user)
+  ;; For User documents, the username is the _id of the document.
+  (clouchdb:put-document
+    `((:|_id| . ,(user-username the-user))
+      (:|_rev| . ,(user-rev the-user))
+      (:|type| . "user")
+      (:|password| . ,(user-password-digest the-user))
+      (:|full-name| . ,(user-full-name the-user))
+      (:|email| . ,(user-email the-user))
+      (:|current-location| . ,(user-current-location the-user))
+      (:|time-zone| . ,(user-time-zone the-user)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; UTILITIES TO SETUP THE COUCHDB DATABASE, MAINLY THE
@@ -250,11 +264,13 @@ a little bit:
 ;                  (:|full-name| . "Jorge Gajon")
 ;                  (:|password| . "5A3218FE6063AD3B9B4A7E49980BAE12") ; gajon
 ;                  (:|current-location| . "Mexico City")
+;                  (:|email| . "jorge.gajon@gmail.com")
 ;                  (:|time-zone| . 6)))
 ;         (user2 `((:|type| . "user")
 ;                  (:|full-name| . "Gorda")
 ;                  (:|password| . "311FFB7B8D804A5DA6B8A6EFD50F4AE5") ; gorda
 ;                  (:|current-location| . "DogoLandia")
+;                  (:|email| . "la_gorda@example.com")
 ;                  (:|time-zone| . 6)))
 ;         (data1 `((:|type| . "task")
 ;                  (:|name| . "Practical Common Lisp (Seibel)")

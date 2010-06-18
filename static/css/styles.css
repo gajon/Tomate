@@ -105,9 +105,7 @@ nav li.notab a:focus, nav li.notab a:hover {
 	text-shadow: 1px 1px 1px #ccc;
 }
 
-/* ------------------------------------------
- * Day navigation
- * ------------------------------------------ */
+/* Day navigation {{{1 */
 #day-navigation {
 	float: left;
 	width: 100%;
@@ -138,9 +136,7 @@ nav li.notab a:focus, nav li.notab a:hover {
 	line-height: 3em;
 }
 
-/* ------------------------------------------
- * Listing of tasks
- * ------------------------------------------ */
+/* Listing of tasks {{{1 */
 
 section.listing {
 	clear: both;
@@ -177,9 +173,7 @@ section.listing tfoot th:first-child { text-align:left !important; }
 
 .highlight { background-color: #faffc5 !important; }
 
-/* ------------------------------------------
- * Add new record
- * ------------------------------------------ */
+/* Add new record {{{1 */
 
 .add-task input {
 	padding: 4px;
@@ -214,9 +208,7 @@ section.listing tfoot th:first-child { text-align:left !important; }
 }
 
 
-/* ------------------------------------------
- * Login form
- * ------------------------------------------ */
+/* Login form {{{1 */
 
 #login {
 	width: 500px;
@@ -255,6 +247,41 @@ section.listing tfoot th:first-child { text-align:left !important; }
 	margin-left: 154px;
 }
 
+/* Account settings {{{1 */
+
+#account-settings,
+#account-change-password {
+	clear:both;
+	float: left;
+	margin-top: 1em !important;
+	width: 100%;
+}
+#account-settings label,
+#account-change-password label {
+	display: block;
+	float: left;
+	font-weight: bold;
+	width: 9em;
+	padding: 4px 0px;
+	margin: 1px 0;
+}
+#account-settings input,
+#account-change-password input {
+	padding: 4px;
+	margin: 2px 0px;
+	background-color: #fff;
+	border: 1px solid #8dbdd8;
+	width: 200px;
+}
+#account-settings button,
+#account-change-password button {
+	margin: 2px 0px;
+	margin-left: 9em;
+}
+#account-settings div,
+#account-change-password div {
+	clear: both;
+}
 
 /* Footer {{{1 */
 

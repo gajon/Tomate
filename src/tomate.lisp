@@ -24,9 +24,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Classes
 
+;;; TODO: Is it a bad idea to carry the _id and _rev data all along?
+;;; For the user, the username is the id of the document.
 (defclass user ()
-  ((full-name :initarg :full-name :accessor user-full-name)
+  ((_rev :initarg :rev :reader user-rev)
+   (full-name :initarg :full-name :accessor user-full-name)
    (username :initarg :username :accessor user-username)
+   (password-digest :initarg :password-digest :accessor user-password-digest)
+   (email :initarg :email :accessor user-email)
    (current-location :initarg :current-location :accessor user-current-location)
    (time-zone :initarg :time-zone :accessor user-time-zone))
   (:documentation ""))

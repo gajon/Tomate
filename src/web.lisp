@@ -296,6 +296,64 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; ACCOUNT SETTINGS
+
+(defun process-account-settings (the-user)
+  ;; It could be that the user wants to change basic info
+  ;; or change her password.
+  (if (post-parameter "full-name")
+    (let ((full-name (trim-or-nil (post-parameter "full-name")))
+          (email (trim-or-nil (post-parameter "email")))
+          (location (trim-or-nil (post-parameter "current-location"))))
+      (setf (user-full-name the-user) (or full-name "")
+            (user-email the-user) (or email "")
+            (user-current-location the-user) (or location ""))
+      (update-user the-user))
+    ;;
+    ;; Change the password
+    ;;
+    (let ((current (trim-or-nil (post-parameter "password")))
+          (new-password (trim-or-nil (post-parameter "new-password")))
+          (new-password2 (trim-or-nil (post-parameter "new-password2"))))
+      (when (and current new-password new-password2
+                 (and (string= new-password new-password2)))
+        (setf (user-password-digest the-user)
+              (hunchentoot::md5-hex new-password))
+        (update-user the-user)))))
+
+(define-url-fn account
+  (when (process-account-settings the-user)
+    (redirect (format nil "/account/?status=ok")))
+  (standard-page (:title "Account settings")
+    (when (get-parameter "status")
+      (htm (:div (:p "The changes were saved"))))
+    (:section :id "account-settings"
+      (:h1 "Account settings:")
+      (:div
+        (:form :method "post" :action "."
+          (:div (text-input "Username:" "username"
+                            :default-value (user-username the-user)
+                            :disabled t))
+          (:div (text-input "Full-name:" "full-name"
+                            :default-value (user-full-name the-user))
+                "Optional")
+          (:div (text-input "E-Mail:" "email"
+                            :default-value (user-email the-user)) "Optional")
+          (:div (text-input "Location:" "current-location"
+                            :default-value (user-current-location the-user))
+                "Optional")
+          (:div (submit-button "Save changes")))))
+    (:section :id "account-change-password"
+      (:h1 "Change password:")
+      (:div
+        (:form :method "post" :action "."
+          (:div (password-input "Current:" "password"))
+          (:div (password-input "New password:" "new-password"))
+          (:div (password-input "Confirm:" "new-password2"))
+          (:div (submit-button "Change")))))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; TESTING
 
 ;(define-url-fn testing
