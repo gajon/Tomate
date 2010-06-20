@@ -381,7 +381,9 @@
           (new-password (trim-or-nil (post-parameter "new-password")))
           (new-password2 (trim-or-nil (post-parameter "new-password2"))))
       (when (and current new-password new-password2
-                 (and (string= new-password new-password2)))
+                 (string= (hunchentoot::md5-hex current)
+                          (user-password-digest the-user))
+                 (string= new-password new-password2))
         (setf (user-password-digest the-user)
               (hunchentoot::md5-hex new-password))
         (update-user the-user)))))
