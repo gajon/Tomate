@@ -67,18 +67,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; INDEX PAGE
 
+
 (define-index-fn
   ;; Validate and set session (if there's a form post).
   (when (eql :post (request-method*))
-    (let ((form-username (trim-or-nil (post-parameter "username")))
-          (form-password (trim-or-nil (post-parameter "password")))
-          (form-timezone (parse-int-force-pos-or-zero
+    (let ((username (trim-or-nil (post-parameter "username")))
+          (password (trim-or-nil (post-parameter "password")))
+          (timezone (parse-int-force-pos-or-zero
                            (trim-or-nil (post-parameter "timezone")))))
-      (if (validate-credentials form-username form-password)
-        (setf (session-value 'authenticated) "yes"
-              (session-value 'username) form-username
-              (session-value 'timezone) form-timezone)
-        (setf (session-value 'authenticated) nil))))
+      (handler-case
+        (progn
+          (validate-credentials username password)
+          (setf (session-value 'authenticated) "yes"
+                (session-value 'username) username
+                (session-value 'timezone) timezone))
+        (condition (c)
+                   (declare (ignorable c))
+                   (setf (session-value 'authenticated) nil)))))
+                   ;(push (princ-to-string c) (session-value 'messages))))))
   (when (string= (session-value 'authenticated) "yes")
     (redirect "/listing/"))
   ;;
