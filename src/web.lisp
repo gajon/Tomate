@@ -67,24 +67,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; INDEX PAGE
 
-
 (define-index-fn
   ;; Validate and set session (if there's a form post).
   (when (eql :post (request-method*))
     (let ((username (trim-or-nil (post-parameter "username")))
           (password (trim-or-nil (post-parameter "password")))
           (timezone (parse-int-force-pos-or-zero
-                           (trim-or-nil (post-parameter "timezone")))))
-      (handler-case
-        (progn
-          (validate-credentials username password)
-          (setf (session-value 'authenticated) "yes"
-                (session-value 'username) username
-                (session-value 'timezone) timezone))
-        (condition (c)
-                   (declare (ignorable c))
-                   (setf (session-value 'authenticated) nil)))))
-                   ;(push (princ-to-string c) (session-value 'messages))))))
+                      (trim-or-nil (post-parameter "timezone")))))
+      (if (and (require-fields username password)
+               (or (validate-credentials username password)
+                   (push-error-msg "The username or password is not valid.")))
+        (setf (session-value 'authenticated) "yes"
+              (session-value 'username) username
+              (session-value 'timezone) timezone)
+        (setf (session-value 'authenticated) nil))))
   (when (string= (session-value 'authenticated) "yes")
     (redirect "/listing/"))
   ;;
@@ -94,6 +90,7 @@
                   :show-banner nil
                   :js-files ("login.js"))
     (:section :id "login"
+      (show-all-messages)
       (:form :method "post" :action "."
              (hidden-input "timezone")
              (:div (text-input "Username:" "username"))
@@ -122,6 +119,7 @@
                   :show-banner nil)
     (:section :id "register"
       (:h1 "Create a new account:")
+      (show-all-messages)
       (:form :method "post" :action "."
         (hidden-input "timezone")
         (:div (text-input "Username:" "username"))
@@ -143,19 +141,24 @@
         (full-name (trim-or-nil (post-parameter "full-name")))
         (location (trim-or-nil (post-parameter "current-location")))
         (password (trim-or-nil (post-parameter "password")))
-        (password2 (trim-or-nil (post-parameter "password2")))
+        (password-confirmation (trim-or-nil (post-parameter "password2")))
         (timezone (parse-int-force-pos-or-zero
                     (trim-or-nil (post-parameter "timezone")))))
-    (when (and username password password2
-               (and (string= password password2)))
-      (add-user
-        (make-instance 'user
-                       :username username
-                       :full-name (or full-name "")
-                       :password-digest (hunchentoot::md5-hex password)
-                       :email ""
-                       :current-location (or location "")
-                       :time-zone timezone)))))
+    (when (and (require-fields username password password-confirmation)
+               (or (string= password password-confirmation)
+                   (push-error-msg "The password didn't match, try again.")))
+      (or
+        ;; If the username already exists, `add-user` will return nil.
+        (add-user
+          (make-instance 'user
+                         :username username
+                         :full-name (or full-name "")
+                         :password-digest (hunchentoot::md5-hex password)
+                         :email ""
+                         :current-location (or location "")
+                         :time-zone timezone))
+        (push-error-msg
+          "The username already exists, please select another.")))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -195,6 +198,7 @@
       ;; THE MAIN LISTING
       ;;
       (:section :class "listing"
+        (show-all-messages)
         (:table :id "task-listing"
                 :class "tablesorter"
                 :cellspacing 1 :cellpadding 0
@@ -249,25 +253,13 @@
   (when (process-add-new-task the-user time-zone)
     (redirect (format nil "/listing/?d=~d" (url-encode (post-parameter "d")))))
   ;; Display form.
-  ;; TODO: What if there's no "d" post parameter?
   (standard-page (:title "Add new record")
-    (render-add-new-task (post-parameter "d"))
-    ;;;
-    ;;; DEBUG
-    ;;;
-    (:section
-      (:header (:h1 "tags"))
-      (:p (loop for tag in (get-all-tags the-user)
-                do (htm (esc tag) ", ")))
-      (:header (:h1 "data"))
-      (loop for p in (post-parameters*)
-            do (htm (:p (esc (car p))
-                        ": "
-                        (esc (cdr p))))))))
+    (render-add-new-task (post-parameter "d"))))
 
 (defun render-add-new-task (today)
   (with-html-output (*standard-output*)
     (:section :class "add-task"
+      (show-all-messages)
       (:header (:h1 "Add new record"))
       (:form :method "post" :action "/add-new-task/"
         (hidden-input "d" :default-value (format nil "~d" today))
@@ -287,7 +279,13 @@
          (real (trim-or-nil
                  ;; Anything that's not a digit is removed
                  (#~s/[^\d+]// (post-parameter "real")))))
-    (when (and task tags (> date 0) estimations real)
+    ;; TODO: What if there's no "d" post parameter?
+    (when (require-fields (task "The task name is required.")
+                          (tags "A list comma separated tags is required.")
+                          (estimations "An estimation is required.
+                                       You can enter estimations separated by
+                                       the plus sign, e.g.: 3+3+2.")
+                          (real "Enter the real (final) number of pomodoros."))
       (add-task
         (make-instance 'task
                        :name task
@@ -300,7 +298,8 @@
                        :estimations (format nil "~{~d~^+~}" estimations)
                        :real (parse-int-force-pos-or-zero real)
                        :date (format-iso8601-date date time-zone))
-        the-user))))
+        the-user)
+      (push-success-msg "The task has been recorded."))))
 
 (defun extract-estimations (estimations)
   (mapcar #'parse-int-force-pos-or-zero
@@ -321,21 +320,26 @@
         (htm (str task))
         (htm #"{"status":"notfound"}"#)))))
 
-;;; TODO: WE ARE REPEATING A LOT OF CODE HERE!
-(defun render-edit-task ()
-  (with-html-output (*standard-output*)
-    (:section :class "add-task"
-      (:header (:h1 "Edit record"))
-      (:form :method "post" :action "/edit-task/"
-        (hidden-input "id")
-        ;; TODO: Get default values from the object if there's no post data.
-        (:div
-          (text-input nil "task")
-          (text-input nil "estimations")
-          (text-input nil "real"))
-        (:div (text-input nil "tags")
-              (submit-button "Save"))))))
+(define-url-fn edit-task
+  (let ((task (get-task (parameter "id"))))
+    (when (and task (process-edit-task task the-user))
+      (redirect (format nil "/listing/?d=~d"
+                        (parse-iso8601-date (task-date task)))))
+    (standard-page (:title "Add new record")
+      (:section :class "add-task"
+        (show-all-messages)
+        (:header (:h1 "Edit record"))
+        (:form :method "post" :action "/edit-task/"
+          (hidden-input "id")
+          ;; TODO: Get default values from the object if there's no post data.
+          (:div
+            (text-input nil "task")
+            (text-input nil "estimations")
+            (text-input nil "real"))
+          (:div (text-input nil "tags")
+                (submit-button "Save")))))))
 
+;;; TODO: WE ARE REPEATING CODE HERE!
 (defun process-edit-task (task the-user)
   (let* ((name (trim-or-nil (post-parameter "task")))
          (tags (loop for tag in (split-sequence #\, (post-parameter "tags"))
@@ -344,20 +348,18 @@
          (real (trim-or-nil
                  ;; Anything that's not a digit is removed
                  (#~s/[^\d+]// (post-parameter "real")))))
-    (when (and task tags estimations real)
+    (when (require-fields (task "The task name is required.")
+                          (tags "A list comma separated tags is required.")
+                          (estimations "An estimation is required.
+                                       You can enter estimations separated by
+                                       the plus sign, e.g.: 3+3+2.")
+                          (real "Enter the real (final) number of pomodoros."))
       (setf (task-name task) name
             (task-tags task) tags
             (task-estimations task) (format nil "~{~d~^+~}" estimations)
             (task-real task) (parse-int-force-pos-or-zero real))
-      (update-task task the-user))))
-
-(define-url-fn edit-task
-  (let ((task (get-task (parameter "id"))))
-    (when (and task (process-edit-task task the-user))
-      (redirect (format nil "/listing/?d=~d"
-                        (parse-iso8601-date (task-date task)))))
-    (standard-page (:title "Add new record")
-      (render-edit-task))))
+      (update-task task the-user)
+      (push-success-msg "The task has been updated."))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -373,28 +375,34 @@
       (setf (user-full-name the-user) (or full-name "")
             (user-email the-user) (or email "")
             (user-current-location the-user) (or location ""))
-      (update-user the-user))
+      (update-user the-user)
+      (push-success-msg "The changes were saved."))
     ;;
     ;; Change the password
     ;;
     (let ((current (trim-or-nil (post-parameter "password")))
           (new-password (trim-or-nil (post-parameter "new-password")))
           (new-password2 (trim-or-nil (post-parameter "new-password2"))))
-      (when (and current new-password new-password2
-                 (string= (hunchentoot::md5-hex current)
-                          (user-password-digest the-user))
-                 (string= new-password new-password2))
+      (when (and (require-fields (current "The current password is required.")
+                                 new-password
+                                 (new-password2
+                                   "The password confirmation is required."))
+                 (or (and (string= (hunchentoot::md5-hex current)
+                                   (user-password-digest the-user))
+                          (string= new-password new-password2))
+                     (push-error-msg "The password didn't match, try again.")))
         (setf (user-password-digest the-user)
               (hunchentoot::md5-hex new-password))
-        (update-user the-user)))))
+        (update-user the-user)
+        (push-success-msg "The password has been changed.")))))
 
 (define-url-fn account
-  (when (process-account-settings the-user)
-    (redirect (format nil "/account/?status=ok")))
+  (when (and (eql :post (request-method*))
+             (process-account-settings the-user))
+    (redirect (format nil "/account/")))
   (standard-page (:title "Account settings")
-    (when (get-parameter "status")
-      (htm (:div (:p "The changes were saved"))))
     (:section :id "account-settings"
+      (show-all-messages)
       (:h1 "Account settings:")
       (:div
         (:form :method "post" :action "."

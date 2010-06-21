@@ -130,6 +130,55 @@ BE CAREFUL."
            (:footer
              (:p "Powered by Common Lisp")))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; QUEUE AND SHOW ERROR/SUCCESS MESSAGES TO THE USER
+
+(defun push-error-msg (msg)
+  (push msg (session-value 'error-msgs))
+  nil)
+
+(defun push-success-msg (msg)
+  (push msg (session-value 'success-msgs)))
+
+(defun %show-messages (msgs css-id)
+  (with-html-output (*standard-output*)
+    (:div :id (escape-string css-id)
+          (:ul (mapcar
+                 (lambda (msg) (htm (:li (esc msg))))
+                 msgs)))))
+
+(defun show-error-messages ()
+  (when (session-value 'error-msgs)
+    (%show-messages (reverse (session-value 'error-msgs)) "errors")
+    (setf (session-value 'error-msgs) nil)))
+
+(defun show-success-messages ()
+  (when (session-value 'success-msgs)
+    (%show-messages (reverse (session-value 'success-msgs)) "success")
+    (setf (session-value 'success-msgs) nil)))
+
+(defun show-all-messages ()
+  (show-error-messages)
+  (show-success-messages))
+
+(defmacro! require-fields (&rest args)
+  `(let ((,g!success t))
+     (flet ((,g!failed (msg)
+               (setf ,g!success nil)
+               (push-error-msg msg)))
+       ,@(mapcar
+           (lambda (arg)
+             (if (consp arg)
+               `(or ,(car arg) (,g!failed ,(cadr arg)))
+               `(or ,arg (,g!failed
+                           ,(format nil "The ~(~a~) is required."
+                                    (#~s/-/ / (symbol-name arg)))))))
+           args)
+       ,g!success)))
+
+;(macroexpand-1 '(require-fields username password))
+;(macroexpand-1 '(require-fields username password-confirmation))
+;(macroexpand-1 '(require-fields (foo "The field foo is lucky.") bar))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; UTILITY MACROS

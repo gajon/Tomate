@@ -105,6 +105,21 @@ nav li.notab a:focus, nav li.notab a:hover {
 	text-shadow: 1px 1px 1px #ccc;
 }
 
+/* Messages and Errors {{{1 */
+
+#errors li, #messages li, #success li {
+	margin: 0 1.5em;
+}
+#errors, #messages, #success {
+	padding:.8em !important;
+	margin-bottom:1em;
+	border:2px solid #ddd;
+}
+#errors {background:#FBE3E4; color:#8a1f11; border-color:#FBC2C4;}
+#messages {background:#FFF6BF; color:#514721; border-color:#FFD324;}
+#success {background:#DDFFDD; color:#264409; border-color:#AADDAA;}
+/*#success {background:#E6EFC2; color:#264409; border-color:#C6D880;}*/
+
 /* Day navigation {{{1 */
 #day-navigation {
 	float: left;
@@ -175,6 +190,12 @@ section.listing tfoot th:first-child { text-align:left !important; }
 
 /* Add new record {{{1 */
 
+section.add-task {
+	clear:both;
+	float: left;
+	margin-top: 1em !important;
+	width: 100%;
+}
 .add-task input {
 	padding: 4px;
 	margin: 2px 4px;
@@ -250,6 +271,11 @@ section.listing tfoot th:first-child { text-align:left !important; }
 #register p { font-size: 90%; }
 #register a { margin-left: 2em; }
 #register h1 { font-size: 2em !important; margin-bottom: 1em; }
+
+#login #errors, #register #errors {
+	width: 400px !important;
+	margin: 0 auto;
+}
 
 
 /* Account settings {{{1 */

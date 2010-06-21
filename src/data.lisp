@@ -22,49 +22,18 @@
 (in-package #:tomate)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; We signal these conditions from several places. A nice property of
-;;; "(signal 'condition-foo)" is that it returns nil if it is not handled
-;;; (when *break-on-signals* is nil.)
-;;;
-;;; This allows calling code to set a handler or simply check for a nil
-;;; value returned.
-
-(define-condition invalid-credentials ()
-  ()
-  (:report "The username and/or password are invalid."))
-
-(define-condition user-already-exists ()
-  ((username :initarg :username :reader username))
-  (:report (lambda (c stream)
-             (format stream "The user with username ~a already exists."
-                     (username c)))))
-
-(define-condition user-doesnt-exists ()
-  ((username :initarg :username :reader username))
-  (:report (lambda (c stream)
-             (format stream "The user ~a does not exist." (username c)))))
-
-(define-condition task-doesnt-exists ()
-  ((task :initarg :task :reader task))
-  (:report (lambda (c stream)
-             (format stream "The task ~a does not exist." (task c)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; DATA RETRIEVAL
 
 (defun get-user-obj (username)
   (handler-case (build-user-from-alist (clouchdb:get-document username))
-    (error () (signal 'user-doesnt-exists :username username))))
+    (error () nil)))
 
 (defun validate-credentials (username password)
   (handler-case
     (let ((alist (clouchdb:get-document username))
           (digest (hunchentoot::md5-hex password)))
-      (or (string= digest (cdr (assoc :|password| alist)))
-          (signal 'invalid-credentials)))
-    ;; catch clouchdb:get-document (or resignal our signal)
-    (error ()
-           (signal 'invalid-credentials))))
+      (string= digest (cdr (assoc :|password| alist))))
+    (error () nil)))
 
 (defun get-all-tasks (user)
   (let ((user (if (eq (type-of user) 'user) (user-username user) user)))
@@ -85,15 +54,14 @@
                                       :key (list user year month date)))))))
 
 (defun get-task (id)
-  (handler-case (build-task-from-alist (clouchdb:get-document id))
-    (error () (signal 'task-doesnt-exists :task id))))
+  (handler-case
+    (build-task-from-alist (clouchdb:get-document id))
+    (error () nil)))
 
 (defun get-task-json (id)
   (handler-case
-    (let ((document (clouchdb:get-document id)))
-      (when document
-        (clouchdb:document-to-json document)))
-    (error () (signal 'task-doesnt-exists :task id))))
+    (clouchdb:document-to-json (clouchdb:get-document id))
+    (error () nil)))
 
 (defun get-all-tags (user)
   (let ((user (if (eq (type-of user) 'user) (user-username user) user)))
@@ -197,9 +165,7 @@ a little bit:
       ;; TODO: fetch the user from the database or simply
       ;; set the _rev field?
       the-user)
-    (error ()
-           (signal 'user-already-exists
-                   :username (user-username the-user)))))
+    (error () nil)))
 
 (defun update-user (the-user)
   ;; For User documents, the username is the _id of the document.
