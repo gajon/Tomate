@@ -44,6 +44,7 @@
    (date :initarg :date
          :initform (format-iso8601-date (get-universal-time) 6)
          :reader task-date)
+   (location :initarg :location :initform "" :accessor task-location)
    (estimations :initarg :estimations :initform 0 :accessor task-estimations)
    (real :initarg :real :initform 0 :accessor task-real)
    (total-estimated :initform 0 :accessor task-total-estimated))

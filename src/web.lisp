@@ -174,7 +174,12 @@
   (let* ((today (get-day-from-parameter-or-now (parameter "d")))
          (yesterday (- today %secs-in-one-day))
          (tomorrow (+ today %secs-in-one-day))
-         (tasks (get-tasks-by-date today time-zone the-user)))
+         (tasks (get-tasks-by-date today time-zone the-user))
+         ;; If we have tasks, the location is the one any of these tasks
+         ;; tells us; otherwise we pull it from the user information.
+         (location (if tasks
+                     (task-location (car tasks))
+                     (user-current-location the-user))))
     (standard-page (:title "Listing of recorded tasks"
                     :css-files ("tablesorter/blue/style.css")
                     :js-files ("code.js" "jquery.tablesorter.min.js"))
@@ -187,7 +192,7 @@
               (:p (:a :href (conc (format nil "?d=~d" yesterday))
                       "<< Previous day")))
         (:div :id "location"
-              (:h1 (esc (user-current-location the-user))
+              (:h1 (esc location)
                    ", " (esc (format-date today time-zone :longform t)))
               (:p "Record sheet"
                   (:span "[" (:a :href "#" "select date") "]")))
@@ -212,7 +217,7 @@
       ;;
       ;; ADD NEW TASK
       ;;
-      (render-add-new-task today))))
+      (render-add-new-task today location))))
 
 (defun render-task-as-row (task)
   (let* ((estimations (task-estimations task))
@@ -254,15 +259,16 @@
     (redirect (format nil "/listing/?d=~d" (url-encode (post-parameter "d")))))
   ;; Display form.
   (standard-page (:title "Add new record")
-    (render-add-new-task (post-parameter "d"))))
+    (render-add-new-task (post-parameter "d") (post-parameter "location"))))
 
-(defun render-add-new-task (today)
+(defun render-add-new-task (today location)
   (with-html-output (*standard-output*)
     (:section :class "add-task"
       (show-all-messages)
       (:header (:h1 "Add new record"))
       (:form :method "post" :action "/add-new-task/"
         (hidden-input "d" :default-value (format nil "~d" today))
+        (hidden-input "location" :default-value location)
         (:div
           (text-input nil "task" :default-value "Task description")
           (text-input nil "estimations" :default-value "Estimations")
@@ -275,6 +281,7 @@
          (tags (loop for tag in (split-sequence #\, (post-parameter "tags"))
                      if (trim-or-nil tag) collect it))
          (date (parse-int-force-pos-or-zero (post-parameter "d")))
+         (location (trim-or-nil (post-parameter "location")))
          (estimations (extract-estimations (post-parameter "estimations")))
          (real (trim-or-nil
                  ;; Anything that's not a digit is removed
@@ -290,6 +297,8 @@
         (make-instance 'task
                        :name task
                        :tags tags
+                       :location (or location
+                                     (user-current-location the-user))
                        ;; We parsed a list of estimations above
                        ;; for example, a user entry like this: "1, 2, 4"
                        ;; is parsed into a list of numbers: '(1 2 4)
