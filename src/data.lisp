@@ -53,17 +53,22 @@
                 (clouchdb:invoke-view "tasks" "tasks-by-date"
                                       :key (list user year month date)))))))
 
-;;;
-;;; TODO: FILTER TASK BY USER, WE DON'T WANT OTHER USERS GUESSING UUIDS
-;;;
-(defun get-task (id)
+(defun get-task (id user)
   (handler-case
-    (build-task-from-alist (clouchdb:get-document id))
+    (let ((user (if (eq (type-of user) 'user) (user-username user) user))
+          (alist (clouchdb:get-document id)))
+      ;; Ensure this user owns the task.
+      (when (string= user (cdr (assoc :|user| alist)))
+        (build-task-from-alist alist)))
     (error () nil)))
 
-(defun get-task-json (id)
+(defun get-task-json (id user)
   (handler-case
-    (clouchdb:document-to-json (clouchdb:get-document id))
+    (let ((user (if (eq (type-of user) 'user) (user-username user) user))
+          (alist (clouchdb:get-document id)))
+      ;; Ensure this user owns the task.
+      (when (string= user (cdr (assoc :|user| alist)))
+        (clouchdb:document-to-json alist)))
     (error () nil)))
 
 (defun get-all-tags (user)
@@ -126,37 +131,39 @@ a little bit:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; DATA STORAGE
 
-(defun add-task (task the-user)
-  (clouchdb:create-document
-    `((:|type| . "task")
-      (:|name| . ,(task-name task))
-      (:|date| . ,(task-date task))
-      (:|tags| . ,(task-tags task))
-      (:|location| . ,(task-location task))
-      (:|estimations| . ,(task-estimations task))
-      (:|real| . ,(task-real task))
-      (:|user| . ,(user-username the-user))))
-  ;; TODO: Should verify that (:|ok| . T)??
-  ;; TODO: fetch the task from the database or simply
-  ;; set the _rev field?
-  task)
+(defun add-task (task user)
+  (let ((user (if (eq (type-of user) 'user) (user-username user) user)))
+    (clouchdb:create-document
+      `((:|type| . "task")
+        (:|name| . ,(task-name task))
+        (:|date| . ,(task-date task))
+        (:|tags| . ,(task-tags task))
+        (:|location| . ,(task-location task))
+        (:|estimations| . ,(task-estimations task))
+        (:|real| . ,(task-real task))
+        (:|user| . ,user)))
+    ;; TODO: Should verify that (:|ok| . T)??
+    ;; TODO: fetch the task from the database or simply
+    ;; set the _rev field?
+    task))
 
-(defun update-task (task the-user)
+(defun update-task (task user)
   ;; TODO: We are repeating code here.
-  (clouchdb:put-document
-    `((:|_id| . ,(task-id task))
-      (:|_rev| . ,(task-rev task))
-      (:|type| . "task")
-      (:|name| . ,(task-name task))
-      (:|date| . ,(task-date task))
-      (:|tags| . ,(task-tags task))
-      (:|location| . ,(task-location task))
-      (:|estimations| . ,(task-estimations task))
-      (:|real| . ,(task-real task))
-      (:|user| . ,(user-username the-user))))
-  ;; TODO: fetch the task from the database or simply
-  ;; set the _rev field?
-  task)
+  (let ((user (if (eq (type-of user) 'user) (user-username user) user)))
+    (clouchdb:put-document
+      `((:|_id| . ,(task-id task))
+        (:|_rev| . ,(task-rev task))
+        (:|type| . "task")
+        (:|name| . ,(task-name task))
+        (:|date| . ,(task-date task))
+        (:|tags| . ,(task-tags task))
+        (:|location| . ,(task-location task))
+        (:|estimations| . ,(task-estimations task))
+        (:|real| . ,(task-real task))
+        (:|user| . ,user)))
+    ;; TODO: fetch the task from the database or simply
+    ;; set the _rev field?
+    task))
 
 (defun delete-task (task)
   (clouchdb:delete-document (task-id task) :if-missing :ignore))

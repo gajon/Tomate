@@ -322,7 +322,7 @@
 ;;; EDIT A TASK
 
 (define-url-fn fetch-task-json
-  (let ((task (get-task-json (parameter "id"))))
+  (let ((task (get-task-json (parameter "id") the-user)))
     (with-html-output-to-string (*standard-output* nil :prologue nil :indent nil)
       (setf (content-type*) "application/json")
       (if task
@@ -330,7 +330,7 @@
         (htm #"{"status":"notfound"}"#)))))
 
 (define-url-fn edit-task
-  (let ((task (get-task (parameter "id"))))
+  (let ((task (get-task (parameter "id") the-user)))
     (when (and task (process-edit-task task the-user))
       (redirect (format nil "/listing/?d=~d"
                         (parse-iso8601-date (task-date task)))))
@@ -378,7 +378,7 @@
   ;; The current user can only retrieve his own tasks,
   ;; it should not be possible for a user to delete the task
   ;; of another user.
-  (let ((task (get-task (post-parameter "id"))))
+  (let ((task (get-task (post-parameter "id") the-user)))
     (if task
       (progn
         (delete-task task)
