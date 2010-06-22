@@ -53,6 +53,9 @@
                 (clouchdb:invoke-view "tasks" "tasks-by-date"
                                       :key (list user year month date)))))))
 
+;;;
+;;; TODO: FILTER TASK BY USER, WE DON'T WANT OTHER USERS GUESSING UUIDS
+;;;
 (defun get-task (id)
   (handler-case
     (build-task-from-alist (clouchdb:get-document id))
@@ -154,6 +157,9 @@ a little bit:
   ;; TODO: fetch the task from the database or simply
   ;; set the _rev field?
   task)
+
+(defun delete-task (task)
+  (clouchdb:delete-document (task-id task) :if-missing :ignore))
 
 (defun add-user (the-user)
   (handler-case

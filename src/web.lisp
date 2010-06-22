@@ -372,6 +372,22 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; DELETE A TASK
+
+(define-url-fn delete-this-task
+  ;; The current user can only retrieve his own tasks,
+  ;; it should not be possible for a user to delete the task
+  ;; of another user.
+  (let ((task (get-task (post-parameter "id"))))
+    (if task
+      (progn
+        (delete-task task)
+        (push-success-msg "The task has been deleted.")
+        (redirect (format nil "/listing/?d=~d"
+                          (parse-iso8601-date (task-date task)))))
+      (redirect "/listing/"))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ACCOUNT SETTINGS
 
 (defun process-account-settings (the-user)
