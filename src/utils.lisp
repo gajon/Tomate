@@ -81,7 +81,8 @@ BE CAREFUL."
 ;;; CAUTION, We expect to capture the free variable `the-user`.
 (defmacro standard-page ((&key (title "")
                                (show-banner t)
-                               css-files js-files)
+                               css-files js-files
+                               (active-tab :listing))
                          &body body)
   `(with-html-output-to-string (*standard-output* nil :prologue t :indent nil)
      (:html
@@ -118,9 +119,12 @@ BE CAREFUL."
            ,(when show-banner
               `(:header :role "banner" :class "banner"
                  (:nav
-                   (:ul (:li :id "current" (:a :href "/listing/" "Listings"))
-                        (:li (:a :href "/reports/" "Reports"))
-                        (:li (:a :href "/account/" "Account"))
+                   (:ul (:li ,@(when (eql active-tab :listing) `(:class "current"))
+                             (:a :href "/listing/" "Listings"))
+                        (:li ,@(when (eql active-tab :reports) `(:class "current"))
+                             (:a :href "/reports/" "Reports"))
+                        (:li ,@(when (eql active-tab :account) `(:class "current"))
+                             (:a :href "/account/" "Account"))
                         (:li :class "notab"
                              (:span "Welcome "
                                     (esc (user-full-name the-user))))

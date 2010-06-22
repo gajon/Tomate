@@ -181,6 +181,7 @@
                      (task-location (car tasks))
                      (user-current-location the-user))))
     (standard-page (:title "Listing of recorded tasks"
+                    :active-tab :listing
                     :css-files ("tablesorter/blue/style.css")
                     :js-files ("code.js" "jquery.tablesorter.min.js"))
       ;;
@@ -425,7 +426,8 @@
   (when (and (eql :post (request-method*))
              (process-account-settings the-user))
     (redirect (format nil "/account/")))
-  (standard-page (:title "Account settings")
+  (standard-page (:title "Account settings"
+                  :active-tab :account)
     (:section :id "account-settings"
       (show-all-messages)
       (:h1 "Account settings:")

@@ -66,11 +66,11 @@ nav a:hover {
 	color:#333;
 }
 
-nav #current {
+nav .current {
 	background-image:url("left_on.gif");
 }
 
-nav #current a {
+nav .current a {
 	background-image:url("right_on.gif");
 	padding-bottom:5px;
 	color:#000;
