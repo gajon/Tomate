@@ -229,26 +229,84 @@ section.add-task {
 }
 
 
-/* Login and Register forms {{{1 */
+/* Login form {{{1 */
 
-#login {
-	width: 500px;
-	margin: 100px auto;
-	border: 1px solid #e6eeee;
-	padding: 2em 0;
+#login-form {
+	float: right;
+	width: 370px;
 }
-#register {
-	width: 500px;
-	margin: 2em auto;
-}
-#login div, #register div {
+#login-form div {
 	clear: left;
 	display: block;
 	zoom: 1;
 	margin: 5px 0 0 0;
 	padding: 1px 3px;
 }
-#login label, #register label {
+#login-form label {
+	display: block;
+	float: left;
+	font-weight: bold;
+	width: 100px;
+	padding: 4px 5px;
+	margin: 1px 0;
+	text-align: right;
+}
+#login-form input {
+	padding: 4px;
+	margin: 2px 4px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	width: 200px;
+}
+#login-form button { margin-left: 114px; }
+#login-form p { margin-left: 114px; line-height: 1.3em; }
+#login-form #errors {
+	width: 330px !important;
+	margin: 0 auto;
+}
+
+#login section {
+	margin: 0 0 0 0 !important;
+	padding: 1em;
+}
+#login h1 {
+	font-size: 1.8em !important;
+	margin-bottom: 0.6em;
+	line-height: 1.3em;
+	text-shadow: 1px 1px 1px #fff !important;
+}
+#login h2 {
+	font-size: 1.3em !important;
+	margin-bottom: 0.6em;
+	text-shadow: 1px 1px 1px #fff !important;
+}
+#login p { margin-bottom: 0.6em; }
+#login blockquote { font-style:italic; }
+
+/*http://www.colourlovers.com/palette/92095/Giant_Goldfish*/
+#login-form { color: #fff; }
+#login-form a { color:#fff; text-decoration:underline; }
+#login-text1 { color: #000; background-color: #69d2e7; }
+#login-text2 { color: #222; background-color: #a7dbd8; }
+#login-text3 { color: #333; background-color: #e0e4cc; }
+#login-text4 { color: #fff; background-color: #f38630; }
+#login-text5 { color: #fff; background-color: #fa6900; }
+#login-text4 a, #login-text5 a { color: #fff; text-decoration:underline; }
+
+#login-text4 h1 { text-shadow: 1px 1px 1px #000 !important; }
+#login-text5 { padding-right: 330px !important; }
+
+/* Register a new account {{{1 */
+
+#register { width: 500px; margin: 2em auto; }
+#register div {
+	clear: left;
+	display: block;
+	zoom: 1;
+	margin: 5px 0 0 0;
+	padding: 1px 3px;
+}
+#register label {
 	display: block;
 	float: left;
 	font-weight: bold;
@@ -257,22 +315,18 @@ section.add-task {
 	margin: 1px 0;
 	text-align: right;
 }
-#login input, #register input {
+#register input {
 	padding: 4px;
 	margin: 2px 4px;
 	background-color: #fff;
 	border: 1px solid #8dbdd8;
 	width: 200px;
 }
-#login button, #login a.new-account,
-#register button, #register p {
-	margin-left: 154px;
-}
+#register button, #register p { margin-left: 154px; }
 #register p { font-size: 90%; }
 #register a { margin-left: 2em; }
 #register h1 { font-size: 2em !important; margin-bottom: 1em; }
-
-#login #errors, #register #errors {
+#register #errors {
 	width: 400px !important;
 	margin: 0 auto;
 }

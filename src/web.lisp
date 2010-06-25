@@ -84,20 +84,93 @@
   (when (string= (session-value 'authenticated) "yes")
     (redirect "/listing/"))
   ;;
-  ;; Render login form
+  ;; Render login page
   ;;
   (standard-page (:title "Login"
                   :show-banner nil
                   :js-files ("login.js"))
-    (:section :id "login"
-      (show-all-messages)
-      (:form :method "post" :action "."
-             (hidden-input "timezone")
-             (:div (text-input "Username:" "username"))
-             (:div (password-input "Password:" "password"))
-             (:div (submit-button "Login"))
-             (:div (:a :href "/register/"
-                       :class "new-account" "New account?"))))))
+    (:div :id "login"
+      (:section :id "login-text1"
+        ;; Login Form
+        (:div :id "login-form"
+          (show-all-messages)
+          (:form :method "post" :action "."
+                 (hidden-input "timezone")
+                 (:div (text-input "Username:" "username"))
+                 (:div (password-input "Password:" "password"))
+                 (:div (submit-button "Login"))
+                 (:div (:p (:a :href "/register/"
+                               :class "new-account" "New account?")
+                           (:br "It's 100% free and only takes 30 seconds. "
+                                "No email required")))))
+        ;; End login form
+        #>END_OF_HTML
+        <h1>Are you using the Pomodoro Technique?</h1>
+
+        <p>Keep using your notebook or any piece of paper to plan your taks
+        and estimate your pomodoros.</p>
+
+        <p>You've gotta admit nothing's better than using a physical &amp;
+        tangible tool when you just want to focus on your work and get
+        things done.</p>
+
+        <div style="clear:both;"></div>
+        END_OF_HTML)
+
+      (:section :id "login-text2"
+        #>END_OF_HTML
+        <h2>Record your achievements with this tool.</h2>
+
+        <p>At the end of the day, week or month (whenever you want) log in
+        and record the total number of pomodoros you achieved. It's that
+        simple!. This is <strong>not</strong> a planning tool, a piece of
+        paper is better for that.</p>
+        END_OF_HTML)
+
+      (:section :id "login-text3"
+        #>END_OF_HTML
+        <h2>Why?</h2>
+
+        <p>So you can easily see your improvement in gettings things done;
+        be aware of where your time goes; if you are spending
+        disproportionaly more time on things that are not that important; or
+        if you are getting better at estimating effort over time.</p>
+        END_OF_HTML)
+
+      (:section :id "login-text4"
+        #>END_OF_HTML
+        <h1>Pomo.. WHAT??</h1>
+
+        <blockquote cite="http://en.wikipedia.org/wiki/Pomodoro_Technique">
+          <p>“The Pomodoro Technique is a time management method
+          developed by Francesco Cirillo in the late 1980s. The technique
+          uses a timer to break down periods of work into 25-minute
+          intervals called 'pomodoros' (from the Italian word for 'tomato')
+          separated by breaks. Closely related to concepts such as
+          timeboxing  and iterative and incremental development used in
+          software design, the method has been adopted in pair programming
+          contexts.</p>
+
+          <p>The method is based on the idea that frequent breaks can
+          improve mental agility and seeks to provide an effective response
+          to time as an anxiety-provoking state referred to as temporal
+          'becoming' ...”</p>
+        </blockquote>
+
+        <p style="text-align:right;">
+        <cite><a href="http://en.wikipedia.org/wiki/Pomodoro_Technique">
+        http://en.wikipedia.org/wiki/Pomodoro_Technique</a></cite></p>
+        END_OF_HTML)
+
+      (:section :id "login-text5"
+        #>END_OF_HTML
+        <p>You can learn more about the technique, read the book from the
+        original author, and download other resources at its web page:</p>
+        <p><a href="http://www.pomodorotechnique.com/">
+        http://www.pomodorotechnique.com/</a></p>
+        END_OF_HTML))))
+
+      
 
 (define-url-fn logout
   (setf (session-value 'authenticated) nil
