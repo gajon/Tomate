@@ -198,9 +198,6 @@
         (:div (text-input "Username:" "username"))
         (:div (:p "Your username can be anything, your email, numbers, whatever,
                   but beginning and ending whitespace will be removed."))
-        (:div (text-input "Full name:" "full-name"))
-        (:div (:p "This is optional, you can enter whatever you want.
-                  It will appear on the heading of your list of tasks."))
         (:div (text-input "Location:" "current-location"))
         (:div (:p "Optional. The Pomodoro Technique encourages you to also
                   record the place you were in when you did your work."))
@@ -211,7 +208,6 @@
 
 (defun process-register-new-account ()
   (let ((username (trim-or-nil (post-parameter "username")))
-        (full-name (trim-or-nil (post-parameter "full-name")))
         (location (trim-or-nil (post-parameter "current-location")))
         (password (trim-or-nil (post-parameter "password")))
         (password-confirmation (trim-or-nil (post-parameter "password2")))
@@ -225,7 +221,7 @@
         (add-user
           (make-instance 'user
                          :username username
-                         :full-name (or full-name "")
+                         :full-name ""
                          :password-digest (hunchentoot::md5-hex password)
                          :email ""
                          :current-location (or location "")

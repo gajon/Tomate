@@ -127,7 +127,8 @@ BE CAREFUL."
                              (:a :href "/account/" "Account"))
                         (:li :class "notab"
                              (:span "Welcome "
-                                    (esc (user-full-name the-user))))
+                                    (esc (or (trim-or-nil (user-full-name the-user))
+                                             (user-username the-user)))))
                         (:li :class "notab" (:a :href "/logout/" "Logout"))))))
            (:div :id "content"
                  ,@body)
