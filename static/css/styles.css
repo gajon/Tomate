@@ -127,11 +127,6 @@ nav li.notab a:focus, nav li.notab a:hover {
 	margin-top: 1em !important;
 }
 
-#day-navigation #location span {
-	font-size: 0.8em;
-	padding-left: 2em;
-}
-
 #day-navigation #location {
 	float:left;
 	width: 60%;
@@ -149,6 +144,19 @@ nav li.notab a:focus, nav li.notab a:hover {
 	width: 20%;
 	text-align:right;
 	line-height: 3em;
+}
+
+#id_datepicker {
+	width: 0px;
+	padding: 0px;
+	border: none;
+}
+.ui-datepicker-trigger {
+	border: none;
+	font: normal 0.8em 'Trebuchet MS',Verdana,Helvetica,sans-serif;
+	background-color: #fff;
+	color: #00f;
+	cursor: pointer;
 }
 
 /* Listing of tasks {{{1 */

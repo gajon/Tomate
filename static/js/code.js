@@ -20,6 +20,21 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 $(document).ready(function() {
+	// PULL DOWN CALENDAR TO GO TO A SPECIFIC DATE
+	$('#id_datepicker').datepicker({
+		dateFormat: "yy-mm-dd",
+		buttonText: "[select date]",
+		buttonImageOnly: false,
+		showOn: "button",
+		changeMonth: true,
+		changeYear: true,
+		//showButtonPanel: true,
+		//closeText: "Cancel",
+		onSelect: function(dateText, inst) {
+			window.location = "/listing/?d=" + dateText;
+		}
+	});
+
 	// SET UP THE TABLESORTER PLUGIN.
 	var tableFound = $(this).find("#task-listing").find("tbody").find("tr");
 	if (tableFound && tableFound.length != 0) {

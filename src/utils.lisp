@@ -272,6 +272,15 @@ BE CAREFUL."
       ;; 2010-05-06
       (format nil "~d-~2,'0d-~2,'0d" year month date))))
 
+(defun parse-date (date time-zone)
+  ;; We expect date to be a string like "2010-06-25"
+  (when (and (stringp date) (= (length date) 10))
+    (let ((year (parse-int-force-pos-or-zero (subseq date 0 4)))
+          (month (parse-int-force-pos-or-zero (subseq date 5 7)))
+          (day (parse-int-force-pos-or-zero (subseq date 8 10))))
+      (when (and (plusp year) (plusp month) (plusp day))
+        (encode-universal-time 0 0 12 day month year time-zone)))))
+
 ;;; REGARDING THE STORED REPRESENTATION OF DATES
 ;;; SEE: http://www.w3.org/TR/NOTE-datetime
 ;;; AND: http://www.blog.activa.be/default,date,2010-03-12.aspx
@@ -292,6 +301,8 @@ BE CAREFUL."
   (flet ((extract-parts (date)
            (multiple-value-bind (lowbound upperbound vector1 vector2)
                ;; 2010-06-10T19:20:30-06:00
+               ;; TODO: Is it a good idea to use a regexp? Why not simply
+               ;;       use subseqs of the string?
                (#~m/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})([-|+])(\d{2}):\d{2}$/
                 date)
              (declare (ignorable lowbound upperbound))
