@@ -42,7 +42,7 @@
    (name :initarg :name :accessor task-name)
    (tags :initarg :tags :initform nil :accessor task-tags)
    (date :initarg :date
-         :initform (format-iso8601-date (get-universal-time) 6)
+         :initform (format-iso8601-date (make-date (get-universal-time) 6))
          :reader task-date)
    (location :initarg :location :initform "" :accessor task-location)
    (estimations :initarg :estimations :initform 0 :accessor task-estimations)
@@ -64,26 +64,19 @@
 
 (defmethod print-object ((task task) stream)
   (print-unreadable-object (task stream :identity t :type t)
-    (multiple-value-bind (s m h day month year)
-        (decode-universal-time (parse-iso8601-date (task-date task)))
-      (declare (ignore s m h))
-      (format stream "~a [~a] (date: ~4,'0d-~2,'0d-~2,'0d)"
-              (task-name task)
-              (task-tags task)
-              year month day))))
+    (let ((date (parse-iso8601-date (task-date task))))
+      (multiple-value-bind (s m h day month year)
+          (decode-universal-time (date-universal-time date)
+                                 (date-time-zone date))
+        (declare (ignore s m h))
+        (format stream "~a [~a] (date: ~4,'0d-~2,'0d-~2,'0d)"
+                (task-name task)
+                (task-tags task)
+                year month day)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Formatted Data
-
-(defgeneric fmt-task-date (task &key longform)
-  (:documentation
-    "See `format-date` documentation."))
-
-(defmethod fmt-task-date ((task task) &key (longform nil))
-  (multiple-value-bind (universal-time time-zone)
-      (parse-iso8601-date (task-date task))
-    (format-date universal-time time-zone :longform longform)))
 
 (defgeneric fmt-task-tags (task)
   (:documentation

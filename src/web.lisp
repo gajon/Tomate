@@ -235,10 +235,10 @@
 
 (define-url-fn listing
   (let* ((today (or (parse-date (parameter "d") time-zone)
-                    (get-universal-time)))
-         (yesterday (- today %secs-in-one-day))
-         (tomorrow (+ today %secs-in-one-day))
-         (tasks (get-tasks-by-date today time-zone the-user))
+                    (make-date (get-universal-time) time-zone)))
+         (yesterday (make-date (date- today %secs-in-one-day)))
+         (tomorrow  (make-date (date+ today %secs-in-one-day)))
+         (tasks (get-tasks-by-date today the-user))
          ;; If we have tasks, the location is the one any of these tasks
          ;; tells us; otherwise we pull it from the user information.
          (location (if tasks
@@ -256,18 +256,15 @@
       ;;
       (:section :id "day-navigation"
         (:div :id "previousday"
-              (:p (:a :href (conc (format nil "?d=~d"
-                                          (format-date yesterday time-zone)))
+              (:p (:a :href (conc (format nil "?d=~a" (format-date yesterday)))
                       "<< Previous day")))
         (:div :id "location"
-              (:h1 (esc location)
-                   ", " (esc (format-date today time-zone :longform t)))
+              (:h1 (esc location) ", " (esc (format-date today :longform t)))
               (:p "Record sheet"
                   (text-input nil "datepicker"
-                              :default-value (format-date today time-zone))))
+                              :default-value (format-date today))))
         (:div :id "nextday"
-              (:p (:a :href (conc (format nil "?d=~d"
-                                          (format-date tomorrow time-zone)))
+              (:p (:a :href (conc (format nil "?d=~a" (format-date tomorrow)))
                       "Next day >>"))))
       ;;
       ;; THE MAIN LISTING
@@ -287,7 +284,7 @@
       ;;
       ;; ADD NEW TASK
       ;;
-      (render-add-new-task today time-zone location))))
+      (render-add-new-task today location))))
 
 (defun render-task-as-row (task)
   (let* ((estimations (task-estimations task))
@@ -325,22 +322,21 @@
 
 (define-url-fn add-new-task
   (let ((today (or (parse-date (post-parameter "d") time-zone)
-                   (get-universal-time))))
+                   (make-date (get-universal-time) time-zone))))
     ;; Validate, create new object and redirect.
-    (when (process-add-new-task the-user today time-zone)
-      (redirect (format nil "/listing/?d=~d" (format-date today time-zone))))
+    (when (process-add-new-task the-user today)
+      (redirect (format nil "/listing/?d=~a" (format-date today))))
     ;; Display form.
     (standard-page (:title "Add new record")
-      (render-add-new-task today time-zone (post-parameter "location")))))
+      (render-add-new-task today (post-parameter "location")))))
 
-(defun render-add-new-task (today time-zone location)
+(defun render-add-new-task (today location)
   (with-html-output (*standard-output*)
     (:section :class "add-task"
       (show-all-messages)
       (:header (:h1 "Add new record"))
       (:form :method "post" :action "/add-new-task/"
-        (hidden-input "d" :default-value (format nil "~d"
-                                                 (format-date today time-zone)))
+        (hidden-input "d" :default-value (format-date today))
         (hidden-input "location" :default-value location)
         (:div
           (text-input nil "task" :default-value "Task description")
@@ -349,7 +345,7 @@
         (:div (text-input nil "tags" :default-value "List of tags")
               (submit-button "Add record"))))))
 
-(defun process-add-new-task (the-user today time-zone)
+(defun process-add-new-task (the-user today)
   (let* ((task (trim-or-nil (post-parameter "task")))
          (tags (loop for tag in (split-sequence #\, (post-parameter "tags"))
                      if (trim-or-nil tag) collect it))
@@ -377,7 +373,7 @@
                        ;; join the numbers with a plus sign: "1+2+4"
                        :estimations (format nil "~{~d~^+~}" estimations)
                        :real (parse-int-force-pos-or-zero real)
-                       :date (format-iso8601-date today time-zone))
+                       :date (format-iso8601-date today))
         the-user)
       (push-success-msg "The task has been recorded."))))
 
@@ -403,11 +399,8 @@
 (define-url-fn edit-task
   (let ((task (get-task (parameter "id") the-user)))
     (when (and task (process-edit-task task the-user))
-      (redirect (format nil "/listing/?d=~d"
-                        ;; TODO: Is this parsing and formatting necessary
-                        (multiple-value-bind (date zone)
-                            (parse-iso8601-date (task-date task))
-                          (format-date date zone)))))
+      (redirect (format nil "/listing/?d=~a"
+                        (format-date (parse-iso8601-date (task-date task))))))
     (standard-page (:title "Add new record")
       (:section :class "add-task"
         (show-all-messages)
@@ -457,10 +450,8 @@
       (progn
         (delete-task task)
         (push-success-msg "The task has been deleted.")
-        (redirect (format nil "/listing/?d=~d"
-                          (multiple-value-bind (date zone)
-                            (parse-iso8601-date (task-date task))
-                            (format-date date zone)))))
+        (redirect (format nil "/listing/?d=~a"
+                          (format-date (parse-iso8601-date (task-date task))))))
       (redirect "/listing/"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

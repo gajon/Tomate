@@ -248,7 +248,58 @@ BE CAREFUL."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; DATE FORMATTING.
+;;; DATE CLASS.
+;;; This is used to encapsulate an universal-time with a time-zone,
+;;; also defining some utility functions to convert the date to
+;;; different representations.
+
+(defclass date ()
+  ((universal-time :initarg :universal-time :reader date-universal-time)
+   (time-zone      :initarg :time-zone      :reader date-time-zone)))
+
+(defmethod print-object ((date date) stream)
+  (print-unreadable-object (date stream :identity t :type t)
+    (format stream "~a (TZ:~a)" (format-date date) (date-time-zone date))))
+
+(defgeneric make-date (time &optional time-zone)
+  (:documentation
+"Creates a DATE object. The time parameter must be either an universal-time
+or another DATE object. If the time-zone is not supplied a default value of
+6 is used. If time is a DATE object and no time-zone is supplied, the
+default value is taken from the DATE object itself."))
+
+(defmethod make-date ((universal-time number) &optional (time-zone 6))
+  (make-instance 'date
+                 :universal-time universal-time
+                 :time-zone time-zone))
+
+(defmethod make-date ((date date) &optional time-zone)
+  (make-instance 'date
+                 :universal-time (date-universal-time date)
+                 :time-zone (or time-zone (date-time-zone date))))
+
+(defgeneric date- (date seconds)
+  (:documentation
+"Creates a new DATE object with its date set to that of the supplied date
+in the first parameter, minus the number of seconds supplied in the second
+parameter."))
+
+(defmethod date- ((date date) (seconds number))
+  (make-instance 'date
+                 :universal-time (- (date-universal-time date) seconds)
+                 :time-zone (date-time-zone date)))
+
+(defgeneric date+ (date seconds)
+  (:documentation
+"Creates a new DATE object with its date set to that of the supplied date
+in the first parameter, plus the number of seconds supplied in the second
+parameter."))
+
+(defmethod date+ ((date date) (seconds number))
+  (make-instance 'date
+                 :universal-time (+ (date-universal-time date) seconds)
+                 :time-zone (date-time-zone date)))
+
 
 (define-constant +day-names+
   #("Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday" "Sunday"))
@@ -257,11 +308,11 @@ BE CAREFUL."
   #("January" "February" "March" "April" "May" "June" "July"
     "August" "September" "October" "November" "December"))
 
-(defun format-date (date time-zone &key (longform nil))
+(defun format-date (date &key (longform nil))
     "Returns a string with the date formatted as \"YYYY-MM-DD\" or as
 \"DayOfWeek Month DD, YYYY\" (eg. Tuesday May 4, 2010) if key :longform is t."
   (multiple-value-bind (s m h date month year day)
-      (decode-universal-time date time-zone)
+      (decode-universal-time (date-universal-time date) (date-time-zone date))
     (declare (ignore s m h))
     (if longform
       ;; Thursday May 6, 2010
@@ -273,31 +324,34 @@ BE CAREFUL."
       (format nil "~d-~2,'0d-~2,'0d" year month date))))
 
 (defun parse-date (date time-zone)
-  ;; We expect date to be a string like "2010-06-25"
+  "Parse a date from a string like \"2010-06-25\" and returns a new DATE
+object representing that date and the supplied time-zone."
   (when (and (stringp date) (= (length date) 10))
     (let ((year (parse-int-force-pos-or-zero (subseq date 0 4)))
           (month (parse-int-force-pos-or-zero (subseq date 5 7)))
           (day (parse-int-force-pos-or-zero (subseq date 8 10))))
       (when (and (plusp year) (plusp month) (plusp day))
-        (encode-universal-time 0 0 12 day month year time-zone)))))
+        (make-date
+          (encode-universal-time 0 0 12 day month year time-zone)
+          time-zone)))))
 
-;;; REGARDING THE STORED REPRESENTATION OF DATES
-;;; SEE: http://www.w3.org/TR/NOTE-datetime
-;;; AND: http://www.blog.activa.be/default,date,2010-03-12.aspx
-;;; AND: http://en.wikipedia.org/wiki/ISO_8601
-
-(defun format-iso8601-date (date time-zone)
+(defun format-iso8601-date (date)
+  "Returns a string with the date formatted to a single restricted format
+from the set of formats defined by ISO 8601. Specifically, the format
+YYYY-MM-DDThh:mm:ssTZD (eg 1997-07-16T19:20:30-05:00 for EST time zone)
+See: http://www.w3.org/TR/NOTE-datetime
+and  http://en.wikipedia.org/wiki/ISO_8601"
   (multiple-value-bind (second minute hour date month year day daylight-p zone)
-      (decode-universal-time date time-zone)
+      (decode-universal-time (date-universal-time date) (date-time-zone date))
     (declare (ignore day daylight-p))
-    ;; YYYY-MM-DDThh:mm:ssTZD (eg 1997-07-16T19:20:30-05:00)
-    ;; for US Eastern Standard Time
     (format nil
             "~d-~2,'0d-~2,'0dT~2,'0d:~2,'0d:~2,'0d~a~2,'0d:00"
             year month date hour minute second
             (if (plusp zone) "-" "+") zone)))
 
 (defun parse-iso8601-date (date)
+  "Parse a date from a string in the following ISO 8601 format
+YYYY-MM-DDThh:mm:ssTZD (eg 1997-07-16T19:20:30-05:00) into a DATE object."
   (flet ((extract-parts (date)
            (multiple-value-bind (lowbound upperbound vector1 vector2)
                ;; 2010-06-10T19:20:30-06:00
@@ -328,7 +382,7 @@ BE CAREFUL."
     ;; universal-time.
     (destructuring-bind (year month day hour minute second zone-+ zone)
         (extract-parts date)
-      (values
+      (make-date
         (encode-universal-time
           second minute hour day month year (* zone zone-+))
         (* zone zone-+)))))
