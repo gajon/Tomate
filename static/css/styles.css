@@ -159,6 +159,13 @@ nav li.notab a:focus, nav li.notab a:hover {
 	cursor: pointer;
 }
 
+#id_changelocation {
+	position: absolute;
+	background-color: #fff;
+	border: 1px solid #aaaaaa;
+	padding: 1em;
+}
+
 /* Listing of tasks {{{1 */
 
 section.listing {

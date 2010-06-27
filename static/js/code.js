@@ -30,8 +30,29 @@ $(document).ready(function() {
 		changeYear: true,
 		//showButtonPanel: true,
 		//closeText: "Cancel",
+		showAnim: 'fold',
 		onSelect: function(dateText, inst) {
 			window.location = "/listing/?d=" + dateText;
+		}
+	});
+
+	// CHANGE LOCATION
+	$('#id_changelocation_button').click(function() {
+		var changelocation = $('#id_changelocation');
+
+		$(changelocation).position({
+			of: $(this),
+			my: "left top",
+			at: "left bottom"
+		});
+		$(changelocation).show('fold');
+	});
+
+	$(document).mousedown(function(event) {
+		var $target = $(event.target);
+		if ($target[0].id != 'id_changelocation' &&
+			$target.parents('#id_changelocation').length == 0) {
+			$('#id_changelocation').hide('fast');
 		}
 	});
 
@@ -215,8 +236,8 @@ $(document).ready(function() {
 	// INSIDE THE FORM INPUTS IF THE USER HAS NOT ENTERED SOMETHING.
 	var newTaskFound = $(this).find("section.add-task");
 	if (newTaskFound && newTaskFound.length != 0) {
-		$('input[type="text"]').addClass("idle");
-		$('input[type="text"]').focus(function() {
+		$('.add-task input[type="text"]').addClass("idle");
+		$('.add-task input[type="text"]').focus(function() {
 			$(this).removeClass("idle").addClass("focused");
 			if (this.value == this.defaultValue) {
 				this.value = '';
@@ -226,7 +247,7 @@ $(document).ready(function() {
 			}
 		});
 
-		$('input[type="text"]').blur(function() {
+		$('.add-task input[type="text"]').blur(function() {
 			if ($.trim(this.value) == '') {
 				this.value = (this.defaultValue ? this.defaultValue : '');
 				$(this).removeClass("focused").addClass("idle");

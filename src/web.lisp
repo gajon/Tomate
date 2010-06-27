@@ -262,10 +262,26 @@
               (:h1 (esc location) ", " (esc (format-date today :longform t)))
               (:p "Record sheet"
                   (text-input nil "datepicker"
-                              :default-value (format-date today))))
+                              :default-value (format-date today))
+                  (:button :id "id_changelocation_button"
+                           :class "ui-datepicker-trigger"; reuse datepicker css
+                           "[location]")))
         (:div :id "nextday"
               (:p (:a :href (conc (format nil "?d=~a" (format-date tomorrow)))
                       "Next day >>"))))
+      ;;
+      ;; This div is used to change the location, it is displayed
+      ;; when the button defined above is clicked on.
+      ;;
+      (:div :id "id_changelocation"
+            :style "display:none;"
+            (:form :method "post" :action "/change-location-day/"
+              (:p
+                (hidden-input "d" :default-value (format-date today))
+                (text-input nil "location" :default-value location)
+                (submit-button "Change"))
+              (:p (:strong "Note:")
+                  " This will change the location of<br>this day only.")))
       ;;
       ;; THE MAIN LISTING
       ;;
@@ -520,6 +536,30 @@
           (:div (password-input "Confirm:" "new-password2"))
           (:div (submit-button "Change")))))))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; CHANGE THE LOCATION OF A SINGLE DAY.
+;;; AND SET THE LOCATION AS THE NEW DEFAULT LOCATION.
+
+(define-url-fn change-location-day
+  (let ((today (parse-date (post-parameter "d") time-zone))
+        (location (trim-or-nil (post-parameter "location"))))
+    (if (and today location)
+      ;; We update the location of the tasks recoded on this day
+      ;; and also update the default location of the user.
+      (progn
+        (mapcar (lambda (task)
+                  (setf (task-location task) location)
+                  (update-task task the-user))
+                (get-tasks-by-date today the-user))
+        (setf (user-current-location the-user) location)
+        (update-user the-user)
+        (push-success-msg "Location has been changed.")
+        (redirect (format nil "/listing/?d=~a" (format-date today))))
+      ;;
+      ;; Post parameters not found or valid, bail out!
+      ;;
+      (redirect "/logout/"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; TESTING
