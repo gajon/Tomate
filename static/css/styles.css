@@ -383,6 +383,15 @@ section.add-task {
 	clear: both;
 }
 
+
+/* Reports {{{1 */
+
+#reports {
+	clear: both;
+	float: left;
+	margin-top: 1em !important;
+}
+
 /* Footer {{{1 */
 
 footer {

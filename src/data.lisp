@@ -72,6 +72,29 @@
         (clouchdb:document-to-json alist)))
     (error () nil)))
 
+(defun get-real-pomodoros-count (user)
+  (let* ((user (if (eq (type-of user) 'user) (user-username user) user))
+         (data (clouchdb:query-document
+                 `(:|rows|)
+                 (clouchdb:invoke-view "reports" "real-pomodoros"
+                                       :group t
+                                       :start-key (list user)
+                                       :end-key (list user (make-hash-table)))))
+         ;; We'll collect the values here.
+         x-dates
+         y-values)
+    (mapcar (lambda (data)
+              ;; The data comes in the following format
+              ;; ((:|key| "gajon" 2010 6 11)
+              ;;  (:|value| (:|totalPomodoros| . 18) (:|numTasks| . 2)))
+              (let ((date (apply #'format nil "~a/~a/~a" (cddar data)))
+                    (alist (cdadr data)))
+                (push date x-dates)
+                (push (cdr (assoc :|totalPomodoros| alist)) y-values)))
+            (car data))
+    (values x-dates y-values)))
+
+
 (defun get-all-tags (user)
   (let ((user (if (eq (type-of user) 'user) (user-username user) user)))
     (mapcar #'cadr
@@ -224,7 +247,7 @@ a little bit:
 ;                      (defun map (doc)
 ;                        (with-slots (type user tags) doc
 ;                          (if (= type "task")
-;                            (doc.tags.for-each
+;                            ((parenscript:@ doc tags for-each)
 ;                              (lambda (tag)
 ;                                (emit (array user tag) 1))))))
 ;                      (defun reduce (keys values)
@@ -245,22 +268,53 @@ a little bit:
 ;                if (doc.type == 'task') {
 ;                  var parts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/.exec(doc.date);
 ;                  if (parts != null) {
-;                    emit([doc.user, parseInt(parts[1], 10), parseInt(parts[2], 10), parseInt(parts[3], 10)], null);
+;                    emit([doc.user,                // The user
+;                          parseInt(parts[1], 10),  // Year
+;                          parseInt(parts[2], 10),  // Month
+;                          parseInt(parts[3], 10)], // Day
+;                         null);
 ;                  }
 ;                }
 ;              }"
 ;    }
+;    END)
+;  
+;  (clouchdb:create-ps-view "reports"
+;    #>END
+;    "real-pomodoros": {
+;      "map": "function(doc) {
+;                if (doc.type == 'task') {
+;                  var parts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/.exec(doc.date);
+;                  if (parts != null) {
+;                    emit([doc.user,                // The user
+;                          parseInt(parts[1], 10),  // Year
+;                          parseInt(parts[2], 10),  // Month
+;                          parseInt(parts[3], 10)], // Day
+;                         doc.real); // And the # of pomodoros.
+;                  }
+;                }
+;              }",
+;      "reduce": "function (keys, values, rereduce) {
+;                   var result = {totalPomodoros:0, numTasks:0};
+;                   for(var i=0; i<values.length; i++) {
+;                     if (rereduce) {
+;                       result.totalPomodoros += values[i].totalPomodoros;
+;                       result.numTasks += values[i].numTasks;
+;                     } else {
+;                       result.totalPomodoros += values[i];
+;                       result.numTasks++;
+;                     }
+;                   }
+;                   return result;
+;                 }"
+;    }
 ;    END))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; OTHER STUFF USED DURING DEVELOPMENT.
-
-
+;
 ;(defun %%delete-design-documents ()
 ;  (clouchdb:delete-view "tasks")
 ;  (clouchdb:delete-view "users")
-;  (clouchdb:delete-view "tags"))
+;  (clouchdb:delete-view "tags")
+;  (clouchdb:delete-view "reports"))
 
 #|
 "validate_doc_update":
@@ -296,6 +350,10 @@ a little bit:
    }
   }"
 |#
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; OTHER STUFF USED DURING DEVELOPMENT.
 
 
 ;(setf clouchdb::*debug-requests* nil)

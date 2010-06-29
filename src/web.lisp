@@ -561,6 +561,81 @@
       ;;
       (redirect "/logout/"))))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; REPORTS
+
+(defmacro! embed-chart (source)
+  (let ((source (url-encode (mkstr "/ofc-test-json/?data=" source))))
+    `(with-html-output (*standard-output*)
+       (:script :type "text/javascript"
+         ,(format nil "swfobject.embedSWF('/static/open-flash-chart.swf', '~a','756','300','9.0.0','expressInstall.swf', {'data-file':'~a'});"
+                  g!div-id source))
+       (:div :id ,(format nil "~a" g!div-id)))))
+
+;(embed-chart estimated)
+
+
+(define-url-fn reports
+  (standard-page (:title "Reports about your data"
+                  :active-tab :reports
+                  :css-files ("jquery-ui-custom-theme/jquery-ui-1.8.2.custom.css")
+                  :js-files ("jquery-ui-1.8.2.custom.min.js"
+                             "swfobject.js"))
+    (:section :id "reports"
+      (:div :class "chart"
+        (:h1 "Real number of pomodoros")
+        (embed-chart estimated-vs-real)
+        ))))
+                                      
+
+(define-url-fn ofc-test-json
+  (with-html-output-to-string (*standard-output* nil :prologue nil :indent nil)
+    (setf (content-type*) "application/json")
+    (cond ((string-equal (parameter "data") "ESTIMATED-VS-REAL")
+           (let ((json-fmt
+                   #>END_OF_HTML
+                   {
+                     "bg_colour": "#ffffff",
+                     "elements":[
+                       {
+                         "type":      "bar",
+                         "colour":    "#0000ff",
+                         "text":      "Real pomodoros",
+                         "font-size": 10,
+                         "values" :   [~{~d~^,~}]
+                       }
+                     ],
+                     "x_axis":{
+                       "stroke":1,
+                       "tick_height":10,
+                       "colour":"#000000",
+                       "grid_colour":"#000000",
+                       "offset": true,
+                       "steps": 1,
+                       "labels": {
+                           "labels": [~{~s~^,~}],
+                           "visible-steps": 4
+                       }
+                      },
+                     "y_axis":{
+                       "stroke":      1,
+                       "tick_length": 3,
+                       "offset":      true,
+                       "max":         20,
+                       "steps": 2,
+                       "colour":      "#000000",
+                       "grid_colour": "#000000"
+                     }
+                  }
+                  END_OF_HTML))
+             (multiple-value-bind (x-dates y-values)
+                 (get-real-pomodoros-count the-user)
+               ;(htm (fmt "~a" (parameter "data")))))))))
+               (htm (fmt json-fmt y-values x-dates))))))))
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; TESTING
 
