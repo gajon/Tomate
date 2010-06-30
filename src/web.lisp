@@ -593,47 +593,41 @@
   (with-html-output-to-string (*standard-output* nil :prologue nil :indent nil)
     (setf (content-type*) "application/json")
     (cond ((string-equal (parameter "data") "ESTIMATED-VS-REAL")
-           (let ((json-fmt
-                   #>END_OF_HTML
-                   {
-                     "bg_colour": "#ffffff",
-                     "elements":[
-                       {
-                         "type":      "bar",
-                         "colour":    "#0000ff",
-                         "text":      "Real pomodoros",
-                         "font-size": 10,
-                         "values" :   [~{~d~^,~}]
-                       }
-                     ],
-                     "x_axis":{
-                       "stroke":1,
-                       "tick_height":10,
-                       "colour":"#000000",
-                       "grid_colour":"#000000",
-                       "offset": true,
-                       "steps": 1,
-                       "labels": {
-                           "labels": [~{~s~^,~}],
-                           "visible-steps": 4
-                       }
-                      },
-                     "y_axis":{
-                       "stroke":      1,
-                       "tick_length": 3,
-                       "offset":      true,
-                       "max":         20,
-                       "steps": 2,
-                       "colour":      "#000000",
-                       "grid_colour": "#000000"
-                     }
-                  }
-                  END_OF_HTML))
-             (multiple-value-bind (x-dates y-values)
-                 (get-real-pomodoros-count the-user)
-               ;(htm (fmt "~a" (parameter "data")))))))))
-               (htm (fmt json-fmt y-values x-dates))))))))
-
+           (multiple-value-bind (x-dates y-values)
+               (get-real-pomodoros-count the-user)
+             (let* ((x-axis (make-instance
+                              'chart-x-axis
+                              :offset-p t
+                              :steps 1
+                              :labels (make-instance 'chart-x-axis-labels
+                                                     :labels x-dates
+                                                     :visible-steps 4)))
+                    (y-axis (make-instance 'chart-y-axis
+                                           :offset-p t
+                                           :max-range 20
+                                           :steps 2))
+                    (x-legend (make-instance 'chart-x-legend
+                                             :text "Last 30 days with records"))
+                    (y-legend (make-instance 'chart-y-legend
+                                             :text "Number of pomodoros"))
+                    (bar (make-instance 'chart-bar
+                                        :colour "#0000ff"
+                                        :values y-values
+                                        :text "Real pomodoros"
+                                        :on-show (make-instance
+                                                   'chart-bar-show
+                                                   :type "grow-up"
+                                                   :cascade 0.5)
+                                        :font-size 10))
+                    (chart (make-instance 'chart
+                                          :bg-colour "#ffffff"
+                                          :x-axis x-axis
+                                          :y-axis y-axis
+                                          :x-legend x-legend
+                                          :y-legend y-legend
+                                          :elements (list bar))))
+               (let ((json:*lisp-identifier-name-to-json* 'ofc-lisp-to-json-name))
+                 (htm (str (json:encode-json-to-string chart))))))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

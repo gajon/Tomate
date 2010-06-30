@@ -36,6 +36,7 @@
                 :components ((:file "lol")
                              (:file "globals")
                              (:file "utils")
+                             (:file "ofc")
                              (:file "tomate")
                              (:file "data")
                              (:file "web"))))
@@ -43,6 +44,7 @@
                :clouchdb
                :cl-who
                :split-sequence
-               :cl-ppcre))
+               :cl-ppcre
+               :cl-json))
 
 ;;; vim: set filetype=lisp:

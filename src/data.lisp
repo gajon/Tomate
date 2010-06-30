@@ -92,7 +92,7 @@
                 (push date x-dates)
                 (push (cdr (assoc :|totalPomodoros| alist)) y-values)))
             (car data))
-    (values x-dates y-values)))
+    (values (nreverse x-dates) (nreverse y-values))))
 
 
 (defun get-all-tags (user)
