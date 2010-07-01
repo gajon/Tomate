@@ -72,7 +72,10 @@
         (clouchdb:document-to-json alist)))
     (error () nil)))
 
-(defun get-real-pomodoros-count (user)
+;;; TODO: What a name!
+(defun get-real-pomodoros-and-tasks-count-by-days (user &key (days 30))
+  (declare (ignore days))
+  ;; TODO: limit by days
   (let* ((user (if (eq (type-of user) 'user) (user-username user) user))
          (data (clouchdb:query-document
                  `(:|rows|)
@@ -82,7 +85,8 @@
                                        :end-key (list user (make-hash-table)))))
          ;; We'll collect the values here.
          x-dates
-         y-values)
+         y-pomodoros
+         y-tasks)
     (mapcar (lambda (data)
               ;; The data comes in the following format
               ;; ((:|key| "gajon" 2010 6 11)
@@ -90,9 +94,10 @@
               (let ((date (apply #'format nil "~a/~a/~a" (cddar data)))
                     (alist (cdadr data)))
                 (push date x-dates)
-                (push (cdr (assoc :|totalPomodoros| alist)) y-values)))
+                (push (cdr (assoc :|totalPomodoros| alist)) y-pomodoros)
+                (push (cdr (assoc :|numTasks| alist)) y-tasks)))
             (car data))
-    (values (nreverse x-dates) (nreverse y-values))))
+    (values (nreverse x-dates) (nreverse y-pomodoros) (nreverse y-tasks))))
 
 
 (defun get-all-tags (user)

@@ -593,8 +593,8 @@
   (with-html-output-to-string (*standard-output* nil :prologue nil :indent nil)
     (setf (content-type*) "application/json")
     (cond ((string-equal (parameter "data") "ESTIMATED-VS-REAL")
-           (multiple-value-bind (x-dates y-values)
-               (get-real-pomodoros-count the-user)
+           (multiple-value-bind (x-dates y-pomodoros)
+               (get-real-pomodoros-and-tasks-count-by-days the-user :days 30)
              (let* ((x-axis (make-instance
                               'chart-x-axis
                               :offset-p t
@@ -612,7 +612,7 @@
                                              :text "Number of pomodoros"))
                     (bar (make-instance 'chart-bar
                                         :colour "#0000ff"
-                                        :values y-values
+                                        :values y-pomodoros
                                         :text "Real pomodoros"
                                         :on-show (make-instance
                                                    'chart-bar-show
