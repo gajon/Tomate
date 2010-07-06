@@ -235,6 +235,7 @@
 
 (define-url-fn listing
   (let* ((today (or (parse-date (parameter "d") time-zone)
+                    (get-last-date-with-records the-user time-zone)
                     (make-date (get-universal-time) time-zone)))
          (yesterday (make-date (date- today %secs-in-one-day)))
          (tomorrow  (make-date (date+ today %secs-in-one-day)))

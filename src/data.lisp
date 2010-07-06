@@ -99,6 +99,28 @@
             (car data))
     (values x-dates y-pomodoros y-tasks)))
 
+(defun get-last-date-with-records (user time-zone)
+  "Returns a new DATE object representing the most recent date that contains
+records from the user, or NIL if there are no records by this user."
+  (let* ((user (if (eq (type-of user) 'user) (user-username user) user))
+         (data
+           ;; By querying the tasks-by-date view, in descending order, we
+           ;; can get the last day that contains records, they keys in this
+           ;; view are of the form [user, year, month, day]
+           (clouchdb:query-document
+             '(:|rows| :|key|)
+             (clouchdb:invoke-view "tasks" "tasks-by-date"
+                                   :descending t
+                                   :limit 1
+                                   :end-key (list user)
+                                   :start-key (list user (make-hash-table))))))
+    ;; data should come as (("user" year month day))
+    (when data
+      (handler-case
+        (destructuring-bind (year month day) (cdar data)
+          (parse-date (format nil "~d-~2,'0d-~2,'0d" year month day)
+                      time-zone))
+        (error () nil)))))
 
 (defun get-all-tags (user)
   (let ((user (if (eq (type-of user) 'user) (user-username user) user)))
