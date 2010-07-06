@@ -74,15 +74,15 @@
 
 ;;; TODO: What a name!
 (defun get-real-pomodoros-and-tasks-count-by-days (user &key (days 30))
-  (declare (ignore days))
-  ;; TODO: limit by days
   (let* ((user (if (eq (type-of user) 'user) (user-username user) user))
          (data (clouchdb:query-document
                  `(:|rows|)
                  (clouchdb:invoke-view "reports" "real-pomodoros"
                                        :group t
-                                       :start-key (list user)
-                                       :end-key (list user (make-hash-table)))))
+                                       :descending t
+                                       :limit days
+                                       :end-key (list user)
+                                       :start-key (list user (make-hash-table)))))
          ;; We'll collect the values here.
          x-dates
          y-pomodoros
@@ -97,7 +97,7 @@
                 (push (cdr (assoc :|totalPomodoros| alist)) y-pomodoros)
                 (push (cdr (assoc :|numTasks| alist)) y-tasks)))
             (car data))
-    (values (nreverse x-dates) (nreverse y-pomodoros) (nreverse y-tasks))))
+    (values x-dates y-pomodoros y-tasks)))
 
 
 (defun get-all-tags (user)
