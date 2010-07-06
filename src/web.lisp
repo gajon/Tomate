@@ -566,12 +566,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; REPORTS
 
-(defmacro! embed-chart (source)
+(defmacro! embed-chart (source &key (width 756) (height 300))
   (let ((source (url-encode (mkstr "/ofc-test-json/?data=" source))))
     `(with-html-output (*standard-output*)
        (:script :type "text/javascript"
-         ,(format nil "swfobject.embedSWF('/static/open-flash-chart.swf', '~a','756','300','9.0.0','expressInstall.swf', {'data-file':'~a'});"
-                  g!div-id source))
+         ,(format nil "swfobject.embedSWF('/static/open-flash-chart.swf',
+                                          '~a','~d','~d','9.0.0',
+                                          'expressInstall.swf',
+                                          {'data-file':'~a'});"
+                  g!div-id width height source))
        (:div :id ,(format nil "~a" g!div-id)))))
 
 ;(embed-chart estimated)
@@ -586,49 +589,94 @@
     (:section :id "reports"
       (:div :class "chart"
         (:h1 "Real number of pomodoros")
-        (embed-chart estimated-vs-real)
-        ))))
-                                      
+        (embed-chart estimated-vs-real))
+      (:div :class "chart"
+        (:h1 "Tags and number of tasks for each")
+        (embed-chart tags :height 500)))))
 
 (define-url-fn ofc-test-json
   (with-html-output-to-string (*standard-output* nil :prologue nil :indent nil)
     (setf (content-type*) "application/json")
-    (cond ((string-equal (parameter "data") "ESTIMATED-VS-REAL")
-           (multiple-value-bind (x-dates y-pomodoros)
-               (get-real-pomodoros-and-tasks-count-by-days the-user :days 30)
-             (let* ((x-axis (make-instance
-                              'chart-x-axis
-                              :offset-p t
-                              :steps 1
-                              :labels (make-instance 'chart-x-axis-labels
-                                                     :labels x-dates
-                                                     :visible-steps 4)))
-                    (y-axis (make-instance 'chart-y-axis
-                                           :offset-p t
-                                           :max-range 20
-                                           :steps 2))
-                    (x-legend (make-instance 'chart-x-legend
-                                             :text "Last 30 days with records"))
-                    (y-legend (make-instance 'chart-y-legend
-                                             :text "Number of pomodoros"))
-                    (bar (make-instance 'chart-bar
-                                        :colour "#0000ff"
-                                        :values y-pomodoros
-                                        :text "Real pomodoros"
-                                        :on-show (make-instance
-                                                   'chart-bar-show
-                                                   :type "grow-up"
-                                                   :cascade 0.5)
-                                        :font-size 10))
-                    (chart (make-instance 'chart
-                                          :bg-colour "#ffffff"
-                                          :x-axis x-axis
-                                          :y-axis y-axis
-                                          :x-legend x-legend
-                                          :y-legend y-legend
-                                          :elements (list bar))))
-               (let ((json:*lisp-identifier-name-to-json* 'ofc-lisp-to-json-name))
-                 (htm (str (json:encode-json-to-string chart))))))))))
+    (cond
+      ;;
+      ;; Real number of pomodoros by date (last 30 days)
+      ;;
+      ((string-equal (parameter "data") "ESTIMATED-VS-REAL")
+       (multiple-value-bind (x-dates y-pomodoros)
+           (get-real-pomodoros-and-tasks-count-by-days the-user :days 30)
+         (let* ((x-axis (make-instance
+                          'chart-x-axis
+                          :offset-p t
+                          :steps 1
+                          :labels (make-instance 'chart-x-axis-labels
+                                                 :labels x-dates
+                                                 :visible-steps 4)))
+                (y-axis (make-instance 'chart-y-axis
+                                       :offset-p t
+                                       :max-range 20
+                                       :steps 2))
+                (x-legend (make-instance 'chart-x-legend
+                                         :text "Last 30 days with records"))
+                (y-legend (make-instance 'chart-y-legend
+                                         :text "Number of pomodoros"))
+                (bar (make-instance 'chart-bar
+                                    :colour "#0000ff"
+                                    :values y-pomodoros
+                                    :text "Real pomodoros"
+                                    :on-show (make-instance
+                                               'chart-bar-show
+                                               :type "grow-up"
+                                               :cascade 0.5)
+                                    :font-size 10))
+                (chart (make-instance 'chart
+                                      :bg-colour "#ffffff"
+                                      :x-axis x-axis
+                                      :y-axis y-axis
+                                      :x-legend x-legend
+                                      :y-legend y-legend
+                                      :elements (list bar))))
+           (let ((json:*lisp-identifier-name-to-json* 'ofc-lisp-to-json-name))
+             (htm (str (json:encode-json-to-string chart)))))))
+      ;;
+      ;; TAGS and the number of tasks recorded for each tag.
+      ;;
+      ((string-equal (parameter "data") "TAGS")
+       (multiple-value-bind (x-tags y-tasks max-value) 
+           (get-all-tags-with-number-of-tasks the-user)
+         (let* ((x-axis (make-instance
+                          'chart-x-axis
+                          :offset-p t
+                          :steps 1
+                          :labels (make-instance 'chart-x-axis-labels
+                                                 :labels x-tags
+                                                 :size 12
+                                                 :rotate 270)))
+                (y-axis (make-instance 'chart-y-axis
+                                       :offset-p t
+                                       :max-range (1+ max-value)
+                                       :steps 1))
+                (x-legend (make-instance 'chart-x-legend
+                                         :text "Tags"))
+                (y-legend (make-instance 'chart-y-legend
+                                         :text "Number of tasks"))
+                (bar (make-instance 'chart-bar
+                                    :colour "#0000ff"
+                                    :values y-tasks
+                                    :text "Number of tasks"
+                                    :on-show (make-instance
+                                               'chart-bar-show
+                                               :type "grow-up"
+                                               :cascade 0.5)
+                                    :font-size 10))
+                (chart (make-instance 'chart
+                                      :bg-colour "#ffffff"
+                                      :x-axis x-axis
+                                      :y-axis y-axis
+                                      :x-legend x-legend
+                                      :y-legend y-legend
+                                      :elements (list bar))))
+           (let ((json:*lisp-identifier-name-to-json* 'ofc-lisp-to-json-name))
+             (htm (str (json:encode-json-to-string chart))))))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

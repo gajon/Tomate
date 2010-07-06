@@ -132,6 +132,27 @@ records from the user, or NIL if there are no records by this user."
                                     ;; ?startkey=["user"]&endkey=["user",{}]
                                     :end-key (list user (make-hash-table)))))))
 
+(defun get-all-tags-with-number-of-tasks (user)
+  "Returns - as multiple values - a list of tag names and a list of the number
+of tasks recorded for each corresponding tag (by it's position), by the user.
+And as a third value, the maximum number of tasks by a single tag.
+Returns NIL if the user has not recorded any tasks yet."
+  (let* ((user (if (eq (type-of user) 'user) (user-username user) user))
+         (data (clouchdb:query-document
+                 '(:|rows|)
+                 (clouchdb:invoke-view "tags" "all-tags" :group t
+                                       :start-key (list user)
+                                       :end-key (list user (make-hash-table))))))
+    ;; (car data) is a list of lists in the following form:
+    ;; ((:|key| "user" "tag") (:|value| . 5))
+    (loop for alist in (car data)
+          for tag       = (caddar alist)
+          for num-tasks = (cdr (assoc :|value| (cdr alist)))
+          collecting tag       into tags
+          collecting num-tasks into tasks
+          maximizing num-tasks into max-num-tasks
+          finally (return (values tags tasks max-num-tasks)))))
+
 (defun get-all-users ()
   (mapcar (lambda (alist) (build-user-from-alist alist))
           (clouchdb:query-document
