@@ -581,12 +581,15 @@
 
 
 (define-url-fn reports
+  (push-info-msg "This section is under development, keep looking for updates (July 6th).")
+  (push-info-msg "And remember to visit the \"Community\" page to suggest reports you'd like to see.")
   (standard-page (:title "Reports about your data"
                   :active-tab :reports
                   :css-files ("jquery-ui-custom-theme/jquery-ui-1.8.2.custom.css")
                   :js-files ("jquery-ui-1.8.2.custom.min.js"
                              "swfobject.js"))
     (:section :id "reports"
+      (show-all-messages)
       (:div :class "chart"
         (:h1 "Real number of pomodoros")
         (embed-chart estimated-vs-real))

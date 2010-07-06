@@ -145,6 +145,9 @@ BE CAREFUL."
 (defun push-success-msg (msg)
   (push msg (session-value 'success-msgs)))
 
+(defun push-info-msg (msg)
+  (push msg (session-value 'info-msgs)))
+
 (defun %show-messages (msgs css-id)
   (with-html-output (*standard-output*)
     (:div :id (escape-string css-id)
@@ -162,8 +165,14 @@ BE CAREFUL."
     (%show-messages (reverse (session-value 'success-msgs)) "success")
     (setf (session-value 'success-msgs) nil)))
 
+(defun show-info-messages ()
+  (when (session-value 'info-msgs)
+    (%show-messages (reverse (session-value 'info-msgs)) "messages")
+    (setf (session-value 'info-msgs) nil)))
+
 (defun show-all-messages ()
   (show-error-messages)
+  (show-info-messages)
   (show-success-messages))
 
 (defmacro! require-fields (&rest args)
