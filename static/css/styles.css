@@ -108,17 +108,23 @@ nav li.notab a:focus, nav li.notab a:hover {
 /* Messages and Errors {{{1 */
 
 #errors li, #messages li, #success li {
-	margin: 0 1.5em;
+	/*margin: 0 1.5em;*/
+	list-style-type:none;
 }
 #errors, #messages, #success {
-	padding:.8em !important;
+	padding:.5em !important;
 	margin-bottom:1em;
 	border:2px solid #ddd;
+	font-size: 1.3em;
+	font-weight:bold;
+	text-shadow: 1px 1px 1px #000;
 }
-#errors {background:#FBE3E4; color:#8a1f11; border-color:#FBC2C4;}
-#messages {background:#FFF6BF; color:#514721; border-color:#FFD324;}
-#success {background:#DDFFDD; color:#264409; border-color:#AADDAA;}
-/*#success {background:#E6EFC2; color:#264409; border-color:#C6D880;}*/
+#messages {
+	text-shadow: 1px 1px 1px #ccc !important;
+}
+#errors {background:#f62626; color:#fff; border-color:#bd0e0e;}
+#messages {background:#fffcc4; border-color:#f5d34e;}
+#success {background:#3aa33a; color:#fff; border-color:#507d50;}
 
 /* Day navigation {{{1 */
 #day-navigation {
