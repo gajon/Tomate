@@ -99,7 +99,7 @@ BE CAREFUL."
          (:link :type "text/css"
                 :rel "stylesheet"
                 :media "screen, projection"
-                :href "/static/css/styles.css")
+                :href "/static/css/styles.css?v=20100707")
          ,@(mapcar (lambda (file)
                      `(:link :type "text/css" :rel "stylesheet"
                              :media "screen, projection"
