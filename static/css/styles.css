@@ -392,9 +392,96 @@ section.add-task {
 	margin-top: 1em !important;
 }
 
+/* Community {{{1 */
+
+#community {
+	clear:both;
+	float: left;
+	margin-top: 1em !important;
+	width: 100%;
+}
+
+/* The list of topics in a board */
+#community-topics div.title h1 {
+	float: left;
+	margin-bottom: 1em;
+}
+#community-topics div.title a {
+	float: left;
+	line-height: 2em;
+	margin-left: 2em;
+}
+
+#community-topics div.topic {
+	clear: both;
+	margin-top: 1em;
+}
+#community-topics div.topic em {
+	margin-left: 2em;
+}
+
+/* For a single topic and the messages within it */
+#community-topic {
+	width: 600px;
+}
+#community-topic div.message {
+	margin-top: 1em;
+}
+#community-topic div.signature {
+	text-align: right;
+	font-style: italic;
+}
+#community-topic-reply textarea {
+	padding: 4px;
+	margin: 2px 0px;
+	background-color: #fff;
+	border: 1px solid #8dbdd8;
+	width: 500px;
+	font: normal 1em 'Trebuchet MS',Verdana,Helvetica,sans-serif;
+}
+#community-topic-reply div.submit {
+	width: 510px;
+	text-align: right;
+}
+
+/* For posting a new topic */
+#community-new-topic h1 {
+	margin-bottom: 1em;
+}
+#community-new-topic textarea {
+	padding: 4px;
+	margin: 2px 0px;
+	background-color: #fff;
+	border: 1px solid #8dbdd8;
+	width: 500px;
+	font: normal 1em 'Trebuchet MS',Verdana,Helvetica,sans-serif;
+}
+#community-new-topic input {
+	padding: 4px;
+	margin: 2px 0px;
+	background-color: #fff;
+	border: 1px solid #8dbdd8;
+	width: 500px;
+}
+#community-new-topic label {
+	display: block;
+	float: left;
+	width: 7em;
+	padding: 4px 0px;
+	margin: 1px 0;
+}
+#community-new-topic button {
+	margin: 2px 0px;
+	margin-left: 7em;
+}
+#community-new-topic div {
+	clear: both;
+}
+
 /* Footer {{{1 */
 
 footer {
+	clear: both;
 }
 
 

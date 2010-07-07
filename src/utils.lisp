@@ -123,6 +123,8 @@ BE CAREFUL."
                              (:a :href "/listing/" "Listings"))
                         (:li ,@(when (eql active-tab :reports) `(:class "current"))
                              (:a :href "/reports/" "Reports"))
+                        (:li ,@(when (eql active-tab :community) `(:class "current"))
+                             (:a :href "/community/" "Community"))
                         (:li ,@(when (eql active-tab :account) `(:class "current"))
                              (:a :href "/account/" "Account"))
                         (:li :class "notab"
@@ -242,6 +244,24 @@ BE CAREFUL."
               :id id
               :name name
               :value default-value))))
+
+(defun text-area (label name &key default-value (cols 30) (rows 7)
+                  disabled labelclass inputclass)
+  (let* ((name (escape-string name))
+         (label (escape-string label))
+         (id (format nil "id_~a" name))
+         (default-value (or (escape-string (post-parameter name))
+                            (escape-string default-value))))
+    (with-html-output (*standard-output*)
+      (when label
+        (htm (:label :for id :class labelclass (str label))))
+      (:textarea :id id
+                 :name name
+                 :cols cols
+                 :rows rows
+                 :class inputclass
+                 :disabled disabled
+        (esc default-value)))))
 
 (defun submit-button (label &key (name "submit") disabled)
   (let* ((name (escape-string name))

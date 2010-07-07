@@ -683,6 +683,82 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; COMMUNITY
+
+(define-url-fn community
+  (standard-page (:title "Community discussion boards"
+                  :active-tab :community)
+    (:section :id "community"
+      (show-all-messages)
+      (:h1 "Community discussion boards (select one to view its topics).")
+      (:div :class "boards"
+        "General discussions" " | "
+        (:a :href "#" "Ideas or suggestions") " | "
+        (:a :href "#" "Problems and bug reports")))
+    (:section :id "community-topics"
+      (:div :class "title"
+        (:h1 "Topics (general discussions):")
+        (:a :href "/community-new-topic/" "Create new topic"))
+      (:div :class "topic"
+        (:a :href "/community-topic/?id=1"
+            "How do you use this application?")
+        (:em "1 message"))
+      (:div :class "topic"
+        (:a :href "/community-topic/?id=2"
+            "I don't want to use a notebook, is there a good software tool
+            for activity inventories and day planning?")
+        (:em "3 messages")))))
+
+(define-url-fn community-topic
+  (standard-page (:title "Community discussion boards"
+                  :active-tab :community)
+    (:section :id "community"
+      (show-all-messages)
+      (:h1 "Community discussion boards (select one to view its topics).")
+      (:div :class "boards"
+        "General discussions" " | "
+        (:a :href "#" "Ideas or suggestions") " | "
+        (:a :href "#" "Problems and bug reports")))
+    (:section :id "community-topic"
+      (:h1 "How do you use this application?")
+      (:div :class "message"
+        (:p "No really, how do you use this thing? I've been trying to make
+            sense out of it but I just can't find my way around it. Is it
+            supposed to be used by the smartest people in the world or what?
+            sigh...")
+        (:div :class "signature"
+          "UnConfuzed" (:br)
+          "Tuesday July 6, 2010"))
+      (:div :class "message"
+        (:p "Chill down dude, it's super easy. Just breath slowly, and find
+            your inner Zen.")
+        (:div :class "signature"
+          "Zen Master" (:br)
+          "Tuesday July 6, 2010")))
+    (:section :id "community-topic-reply"
+      (:h1 "Add a reply:")
+      (:form :method "post" :action "."
+        (:div (text-area nil "reply"))
+        (:div :class "submit" (submit-button "Send reply"))))))
+
+(define-url-fn community-new-topic
+  (standard-page (:title "Community discussion boards"
+                  :active-tab :community)
+    (:section :id "community"
+      (show-all-messages)
+      (:h1 "Community discussion boards (select one to view its topics).")
+      (:div :class "boards"
+        "General discussions" " | "
+        (:a :href "#" "Ideas or suggestions") " | "
+        (:a :href "#" "Problems and bug reports")))
+    (:section :id "community-new-topic"
+      (:h1 "Create a new topic")
+      (:form :method "post" :action "."
+        (:div (text-input "Title:" "title"))
+        (:div (text-area "Message:" "message"))
+        (:div (submit-button "Save"))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; TESTING
 
 ;(define-url-fn testing
