@@ -694,7 +694,6 @@
       ;; Board selection
       ;;
       (:section :id "community"
-        (show-all-messages)
         (:h1 "Community discussion boards (select one to view its topics).")
         (:div :class "boards"
           "General discussions" " | "
@@ -704,6 +703,7 @@
       ;; List of topics
       ;;
       (:section :id "community-topics"
+        (show-all-messages)
         (:div :class "title"
           (:h1 "Topics (general discussions):")
           (:a :href (str (format nil "/community-new-topic/?board=~a" board))
@@ -725,13 +725,27 @@
          (topic (get-topic topic-id))
          (messages (get-topic-messages topic-id)))
     (unless topic (redirect "/community/"))
+    ;;
+    ;; Sent a new reply, save it.
+    ;;
+    (when (eql :post (request-method*))
+      (let ((reply (trim-or-nil (post-parameter "reply"))))
+        (when (require-fields (reply "You cannot send an empty reply."))
+          (add-topic-msg
+            (make-instance 'topic-msg
+                           :topic topic-id
+                           :date (format-iso8601-date
+                                   (make-date (get-universal-time) time-zone))
+                           :user (user-username the-user)
+                           :message reply))
+          (push-success-msg "Your reply has been sent.")
+          (redirect (format nil "/community-topic/?topic=~a" topic-id)))))
     (standard-page (:title "Community discussion boards"
                     :active-tab :community)
       ;;
       ;; Board selection   TODO: Abstract it out
       ;;
       (:section :id "community"
-        (show-all-messages)
         (:h1 "Community discussion boards (select one to view its topics).")
         (:div :class "boards"
           "General discussions" " | "
@@ -741,6 +755,7 @@
       ;; The topic and its messages
       ;;
       (:section :id "community-topic"
+        (show-all-messages)
         (:h1 (esc (topic-title topic)))
         (loop for msg in messages do
               (htm
@@ -751,9 +766,13 @@
                     (esc (format-date
                            (parse-iso8601-date (topic-msg-date msg))
                            :longform t))))))
+        ;;
+        ;; Form to add a new reply
+        ;;
         (:section :id "community-topic-reply"
           (:h1 "Add a reply:")
           (:form :method "post" :action "."
+                 (hidden-input "topic" :default-value topic-id)
                  (:div (text-area nil "reply"))
                  (:div :class "submit" (submit-button "Send reply"))))))))
 

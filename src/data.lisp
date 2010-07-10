@@ -340,6 +340,20 @@ a little bit:
   ;; set the _rev field?
   the-user)
 
+(defun add-topic-msg (msg)
+  (clouchdb:create-document
+    `((:|type| . "topic-msg")
+      (:|postTime| . ,(get-universal-time))
+      (:|topic| . ,(topic-msg-topic msg))
+      (:|date| . ,(topic-msg-date msg))
+      (:|user| . ,(topic-msg-user msg))
+      (:|message| . ,(topic-msg-message msg))))
+  ;; TODO: Should verify that (:|ok| . T)??
+  ;; TODO: fetch the topic-msg from the database or simply
+  ;; set the _rev field?
+  msg)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; UTILITIES TO SETUP THE COUCHDB DATABASE, MAINLY THE
 ;;; DESIGN VIEWS.
@@ -446,9 +460,9 @@ a little bit:
 ;    END
 ;    (clouchdb:ps-view ("topic-messages-ordered")
 ;                      (defun map (doc)
-;                        (with-slots (type sort topic) doc
+;                        (with-slots (type post-time topic) doc
 ;                          (if (= type "topic-msg")
-;                            (emit (array topic sort) nil)))))
+;                            (emit (array topic post-time) nil)))))
 ;    (clouchdb:ps-view ("topic-messages-count")
 ;                      (defun map (doc)
 ;                        (with-slots (type topic) doc
@@ -563,7 +577,7 @@ a little bit:
 ;                        '(:|id|)
 ;                        (clouchdb:create-document topic2)))
 ;           (topic-msg `((:|type| . "topic-msg")
-;                        (:|sort| . 1)
+;                        (:|postTime| . ,(get-universal-time))
 ;                        (:|topic| . ,(car topic-id1))
 ;                        (:|date| . ,(format-iso8601-date
 ;                                      (make-date (- (get-universal-time) %secs-in-one-day)
@@ -571,13 +585,13 @@ a little bit:
 ;                        (:|user| . "gajon")
 ;                        (:|message| . "No really, how do you use this thing? I've been trying to make sense out of it but I just can't find my way around it. Is it supposed to be used by the smartest people in the world or what?  sigh...")))
 ;           (topic-msg2 `((:|type| . "topic-msg")
-;                         (:|sort| . 2)
+;                         (:|postTime| . ,(get-universal-time))
 ;                         (:|topic| . ,(car topic-id1))
 ;                         (:|date| . ,(format-iso8601-date (make-date (get-universal-time) 6)))
 ;                         (:|user| . "gorda")
 ;                         (:|message| . "Chill down dude, it's super easy. Just breath slowly, and find your inner Zen.")))
 ;           (topic-msg3 `((:|type| . "topic-msg")
-;                         (:|sort| . 1)
+;                         (:|postTime| . ,(get-universal-time))
 ;                         (:|topic| . ,(car topic-id2))
 ;                         (:|date| . ,(format-iso8601-date (make-date (get-universal-time) 6)))
 ;                         (:|user| . "gajon")

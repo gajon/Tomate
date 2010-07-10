@@ -112,6 +112,7 @@ nav li.notab a:focus, nav li.notab a:hover {
 	list-style-type:none;
 }
 #errors, #messages, #success {
+	clear: both;
 	padding:.5em !important;
 	margin-bottom:1em;
 	border:2px solid #ddd;
