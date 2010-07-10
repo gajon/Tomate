@@ -372,6 +372,13 @@ section.add-task {
 	padding: 4px 0px;
 	margin: 1px 0;
 }
+#account-settings em {
+	display:block;
+	margin-left: 9em;
+	margin-bottom: 0.5em;
+	width: 400px;
+	color: #666;
+}
 #account-settings input,
 #account-change-password input {
 	padding: 4px;

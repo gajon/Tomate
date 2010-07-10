@@ -521,9 +521,12 @@
                             :disabled t))
           (:div (text-input "Full-name:" "full-name"
                             :default-value (user-full-name the-user))
-                "Optional")
+                "Optional"
+                (:em "If supplied it will be shown in the community
+                     forums, otherwise only your username will be shown."))
           (:div (text-input "E-Mail:" "email"
-                            :default-value (user-email the-user)) "Optional")
+                            :default-value (user-email the-user))
+                "Optional")
           (:div (text-input "Location:" "current-location"
                             :default-value (user-current-location the-user))
                 "Optional")
@@ -744,15 +747,17 @@
       (:section :id "community-topic"
         (show-all-messages)
         (:h1 (esc (topic-title topic)))
-        (loop for msg in messages do
+        (loop for msg in messages
+              for msg-user = (get-user-obj (topic-msg-user msg)) do
               (htm
                 (:div :class "message"
                   (:p (esc (topic-msg-message msg)))
                   (:div :class "signature"
-                    (esc (topic-msg-user msg)) (:br)
-                    (esc (format-date
-                           (parse-iso8601-date (topic-msg-date msg))
-                           :longform t))))))
+                    (esc (or (trim-or-nil (user-full-name msg-user))
+                             (user-username msg-user)))
+                    (:br)
+                    (esc (format-date (parse-iso8601-date (topic-msg-date msg))
+                                      :longform t))))))
         ;;
         ;; Form to add a new reply
         ;;
