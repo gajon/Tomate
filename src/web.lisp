@@ -769,16 +769,48 @@
                  (:div :class "submit" (submit-button "Send reply"))))))))
 
 (define-url-fn community-new-topic
-  (standard-page (:title "Community discussion boards"
-                  :active-tab :community)
-    (display-board-selection)
-    (:section :id "community-new-topic"
-      (show-all-messages)
-      (:h1 "Create a new topic")
-      (:form :method "post" :action "."
-        (:div (text-input "Title:" "title"))
-        (:div (text-area "Message:" "message"))
-        (:div (submit-button "Save"))))))
+  (let ((board (parse-int-force-pos-or-zero (parameter "board"))))
+    (unless (> board 0) (redirect "/community/"))
+    ;;
+    ;; Process the new topic.
+    ;;
+    (when (eql :post (request-method*))
+      (let ((title (trim-or-nil (post-parameter "title")))
+            (message (trim-or-nil (post-parameter "message"))))
+        (when (require-fields title message)
+          ;; We have to create two documents, one is the topic itself
+          ;; and the other is the first message under this topic.
+          (let ((new-topic
+                  (add-topic
+                    (make-instance 'topic
+                                   :board board
+                                   :title title
+                                   :date (format-iso8601-date
+                                           (make-date (get-universal-time)
+                                                      time-zone))
+                                   :user (user-username the-user)))))
+            (add-topic-msg (make-instance 'topic-msg
+                                          :topic (topic-id new-topic)
+                                          :date (topic-date new-topic)
+                                          :user (topic-user new-topic)
+                                          :message message))
+            (push-success-msg "Your topic has been created.")
+            (redirect (format nil "/community-topic/?topic=~a"
+                              (topic-id new-topic)))))))
+    ;;
+    ;; Display the form and error messages.
+    ;;
+    (standard-page (:title "Community discussion boards"
+                    :active-tab :community)
+      (display-board-selection)
+      (:section :id "community-new-topic"
+        (show-all-messages)
+        (:h1 "Create a new topic")
+        (:form :method "post" :action "."
+               (hidden-input "board" :default-value (mkstr board))
+               (:div (text-input "Title:" "title"))
+               (:div (text-area "Message:" "message"))
+               (:div (submit-button "Save")))))))
 
 (defun display-board-selection ()
   (with-html-output (*standard-output*)

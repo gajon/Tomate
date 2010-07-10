@@ -340,6 +340,18 @@ a little bit:
   ;; set the _rev field?
   the-user)
 
+(defun add-topic (topic)
+  (let ((result (clouchdb:create-document
+                  `((:|type| . "topic")
+                    (:|board| . ,(topic-board topic))
+                    (:|title| . ,(topic-title topic))
+                    (:|user| . ,(topic-user topic))
+                    (:|date| . ,(topic-date topic))))))
+    (when (assoc :|id| result)
+      (setf (slot-value topic '_id) (cdr (assoc :|id| result))
+            (slot-value topic '_rev) (cdr (assoc :|rev| result)))
+      topic)))
+
 (defun add-topic-msg (msg)
   (clouchdb:create-document
     `((:|type| . "topic-msg")
