@@ -686,60 +686,76 @@
 ;;; COMMUNITY
 
 (define-url-fn community
-  (standard-page (:title "Community discussion boards"
-                  :active-tab :community)
-    (:section :id "community"
-      (show-all-messages)
-      (:h1 "Community discussion boards (select one to view its topics).")
-      (:div :class "boards"
-        "General discussions" " | "
-        (:a :href "#" "Ideas or suggestions") " | "
-        (:a :href "#" "Problems and bug reports")))
-    (:section :id "community-topics"
-      (:div :class "title"
-        (:h1 "Topics (general discussions):")
-        (:a :href "/community-new-topic/" "Create new topic"))
-      (:div :class "topic"
-        (:a :href "/community-topic/?id=1"
-            "How do you use this application?")
-        (:em "1 message"))
-      (:div :class "topic"
-        (:a :href "/community-topic/?id=2"
-            "I don't want to use a notebook, is there a good software tool
-            for activity inventories and day planning?")
-        (:em "3 messages")))))
+  (let* ((board (or (parameter "board") 1))
+         (topics (get-all-topics board)))
+    (standard-page (:title "Community discussion boards"
+                    :active-tab :community)
+      ;;
+      ;; Board selection
+      ;;
+      (:section :id "community"
+        (show-all-messages)
+        (:h1 "Community discussion boards (select one to view its topics).")
+        (:div :class "boards"
+          "General discussions" " | "
+          (:a :href "#" "Ideas or suggestions") " | "
+          (:a :href "#" "Problems and bug reports")))
+      ;;
+      ;; List of topics
+      ;;
+      (:section :id "community-topics"
+        (:div :class "title"
+          (:h1 "Topics (general discussions):")
+          (:a :href (str (format nil "/community-new-topic/?board=~a" board))
+              "Create new topic"))
+        (loop for topic in topics
+              for topic-id = (topic-id topic)
+              for topic-url = (format nil "/community-topic/?topic=~a" topic-id)
+              for topic-msg-count = (get-topic-messages-count topic-id)
+              do
+              (htm
+                (:div :class "topic"
+                  (:a :href topic-url (esc (topic-title topic)))
+                  (:em (esc (format nil "~a message~p"
+                                    topic-msg-count
+                                    topic-msg-count))))))))))
 
 (define-url-fn community-topic
-  (standard-page (:title "Community discussion boards"
-                  :active-tab :community)
-    (:section :id "community"
-      (show-all-messages)
-      (:h1 "Community discussion boards (select one to view its topics).")
-      (:div :class "boards"
-        "General discussions" " | "
-        (:a :href "#" "Ideas or suggestions") " | "
-        (:a :href "#" "Problems and bug reports")))
-    (:section :id "community-topic"
-      (:h1 "How do you use this application?")
-      (:div :class "message"
-        (:p "No really, how do you use this thing? I've been trying to make
-            sense out of it but I just can't find my way around it. Is it
-            supposed to be used by the smartest people in the world or what?
-            sigh...")
-        (:div :class "signature"
-          "UnConfuzed" (:br)
-          "Tuesday July 6, 2010"))
-      (:div :class "message"
-        (:p "Chill down dude, it's super easy. Just breath slowly, and find
-            your inner Zen.")
-        (:div :class "signature"
-          "Zen Master" (:br)
-          "Tuesday July 6, 2010")))
-    (:section :id "community-topic-reply"
-      (:h1 "Add a reply:")
-      (:form :method "post" :action "."
-        (:div (text-area nil "reply"))
-        (:div :class "submit" (submit-button "Send reply"))))))
+  (let* ((topic-id (parameter "topic"))
+         (topic (get-topic topic-id))
+         (messages (get-topic-messages topic-id)))
+    (unless topic (redirect "/community/"))
+    (standard-page (:title "Community discussion boards"
+                    :active-tab :community)
+      ;;
+      ;; Board selection   TODO: Abstract it out
+      ;;
+      (:section :id "community"
+        (show-all-messages)
+        (:h1 "Community discussion boards (select one to view its topics).")
+        (:div :class "boards"
+          "General discussions" " | "
+          (:a :href "#" "Ideas or suggestions") " | "
+          (:a :href "#" "Problems and bug reports")))
+      ;;
+      ;; The topic and its messages
+      ;;
+      (:section :id "community-topic"
+        (:h1 (esc (topic-title topic)))
+        (loop for msg in messages do
+              (htm
+                (:div :class "message"
+                  (:p (esc (topic-msg-message msg)))
+                  (:div :class "signature"
+                    (esc (topic-msg-user msg)) (:br)
+                    (esc (format-date
+                           (parse-iso8601-date (topic-msg-date msg))
+                           :longform t))))))
+        (:section :id "community-topic-reply"
+          (:h1 "Add a reply:")
+          (:form :method "post" :action "."
+                 (:div (text-area nil "reply"))
+                 (:div :class "submit" (submit-button "Send reply"))))))))
 
 (define-url-fn community-new-topic
   (standard-page (:title "Community discussion boards"

@@ -122,6 +122,7 @@ records from the user, or NIL if there are no records by this user."
                       time-zone))
         (error () nil)))))
 
+;; TODO: This is not being used.
 (defun get-all-tags (user)
   (let ((user (if (eq (type-of user) 'user) (user-username user) user)))
     (mapcar #'cadr
@@ -158,6 +159,56 @@ Returns NIL if the user has not recorded any tasks yet."
           (clouchdb:query-document
             `(:|rows| :|value|)
             (clouchdb:invoke-view "users" "all-users"))))
+
+(defun get-topic (topic-id)
+  (handler-case
+    (build-topic-from-alist (clouchdb:get-document topic-id))
+    (error () nil)))
+
+(defun get-all-topics (board)
+  (mapcar (lambda (alist) (build-topic-from-alist alist))
+          ;; TODO:
+          ;; The reason we are doing nreverse here is that the function
+          ;; clouchdb:query-document reverses the results it receives
+          ;; after matching them against the query. For instance, if the
+          ;; view returns data like
+          ;; '(:|rows| ((:|id| . "id1")
+          ;;            (:|id| . "id2")
+          ;;            (:|id| . "id3")))
+          ;; and we filter that with (query-document '(:|rows| :|id|) *)
+          ;; we will get
+          ;; ("id3" "id2" "id1")
+          ;;
+          ;; Of course we could get the order we want by inverting the order
+          ;; in the invoke-view call, but it feels kludgy. Maybe we should
+          ;; just patch clouchdb:query-document to do the right thing or
+          ;; keep nreversing its result here.
+          (nreverse
+            (clouchdb:query-document
+              `(:|rows| :|id| ,#'clouchdb:get-document)
+              (clouchdb:invoke-view "community" "all-topics"
+                                    :descending t
+                                    :end-key (list board)
+                                    :start-key (list board
+                                                     (make-hash-table)))))))
+
+(defun get-topic-messages (topic)
+  (mapcar (lambda (alist) (build-topic-msg-from-alist alist))
+          ;; TODO: Same deal as with 'get-all-topics'.
+          (nreverse
+            (clouchdb:query-document
+              `(:|rows| :|id| ,#'clouchdb:get-document)
+              (clouchdb:invoke-view "community" "topic-messages-ordered"
+                                    :start-key (list topic)
+                                    :end-key (list topic (make-hash-table)))))))
+
+(defun get-topic-messages-count (topic)
+  (car
+    (clouchdb:query-document
+      '(:|rows| :|value|)
+      (clouchdb:invoke-view "community" "topic-messages-count"
+                            :group t
+                            :key topic))))
 
 
 (defmacro %couchdb-field (field-name obj)
@@ -199,6 +250,24 @@ a little bit:
                  :email (%couchdb-field 'email alist)
                  :current-location (%couchdb-field 'current-location alist)
                  :time-zone (%couchdb-field 'time-zone alist)))
+
+(defun build-topic-from-alist (alist)
+  (make-instance 'topic
+                 :id (%couchdb-field '_id alist)
+                 :rev (%couchdb-field '_rev alist)
+                 :board (%couchdb-field 'board alist)
+                 :title (%couchdb-field 'title alist)
+                 :date (%couchdb-field 'date alist)
+                 :user (%couchdb-field 'user alist)))
+
+(defun build-topic-msg-from-alist (alist)
+  (make-instance 'topic-msg
+                 :id (%couchdb-field '_id alist)
+                 :rev (%couchdb-field '_rev alist)
+                 :topic (%couchdb-field 'topic alist)
+                 :date (%couchdb-field 'date alist)
+                 :user (%couchdb-field 'user alist)
+                 :message (%couchdb-field 'message alist)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; DATA STORAGE
@@ -356,49 +425,48 @@ a little bit:
 ;                   return result;
 ;                 }"
 ;    }
-;    END))
+;    END)
+;                   
+;  (clouchdb:create-ps-view "community"
+;    #>END
+;    "all-topics": {
+;      "map": "function(doc) {
+;                if (doc.type == 'topic') {
+;                  var parts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/.exec(doc.date);
+;                  if (parts != null) {
+;                    emit([doc.board,
+;                          parseInt(parts[1], 10),  // Year
+;                          parseInt(parts[2], 10),  // Month
+;                          parseInt(parts[3], 10)], // Day
+;                         null);
+;                  }
+;                }
+;              }"
+;    }
+;    END
+;    (clouchdb:ps-view ("topic-messages-ordered")
+;                      (defun map (doc)
+;                        (with-slots (type sort topic) doc
+;                          (if (= type "topic-msg")
+;                            (emit (array topic sort) nil)))))
+;    (clouchdb:ps-view ("topic-messages-count")
+;                      (defun map (doc)
+;                        (with-slots (type topic) doc
+;                          (if (= type "topic-msg")
+;                            (emit topic 1))))
+;                      (defun reduce (keys values)
+;                        (return (sum values))))))
 ;
 ;(defun %%delete-design-documents ()
 ;  (clouchdb:delete-view "tasks")
 ;  (clouchdb:delete-view "users")
 ;  (clouchdb:delete-view "tags")
-;  (clouchdb:delete-view "reports"))
-
-#|
-"validate_doc_update":
-  "function (newDoc, oldDoc, userCtx) {
-    function require(field, message) {
-      message = message || "Document must have a " + field;
-      if (!newDoc[field]) throw({forbidden : message});
-    };
-    
-    if (newDoc.type == "task") {
-      require("name");
-      require("date");
-      require("tags");
-      require("user");
-      require("estimations");
-      require("real");
-    }
-  }"
-|#
-
-#|
-"validate_doc_update":
-  "function (newDoc, oldDoc, userCtx) {
-     function require(field, message) {
-       message = message || "Document must have a " + field;
-       if (!newDoc[field]) throw({forbidden : message});
-     };
-
-   if (newDoc.type == "user") {
-     require("full-name");
-     require("username");
-     require("current-location");
-   }
-  }"
-|#
-
+;  (clouchdb:delete-view "reports")
+;  (clouchdb:delete-view "community"))
+;
+;(defun %%recreate-design-documents ()
+;  (%%delete-design-documents)
+;  (%%create-design-documents))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OTHER STUFF USED DURING DEVELOPMENT.
@@ -468,7 +536,17 @@ a little bit:
 ;                  (:|location| . "DogoLandia")
 ;                  (:|estimations| . "1")
 ;                  (:|real| . 1)
-;                  (:|user| . "gorda"))))
+;                  (:|user| . "gorda")))
+;         (topic1 `((:|type| . "topic")
+;                   (:|board| . 1) ;; General discussions
+;                   (:|title| . "How do you use this application?")
+;                   (:|user| . "gajon")
+;                   (:|date| . ,(format-iso8601-date (make-date (get-universal-time) 6)))))
+;         (topic2 `((:|type| . "topic")
+;                   (:|board| . 1) ;; General discussions
+;                   (:|title| . "Another test topic")
+;                   (:|user| . "gajon")
+;                   (:|date| . ,(format-iso8601-date (make-date (get-universal-time) 6))))))
 ;    (clouchdb:create-document user1 :id "gajon")
 ;    (clouchdb:create-document user2 :id "gorda")
 ;    (clouchdb:create-document data1)
@@ -476,7 +554,37 @@ a little bit:
 ;    (clouchdb:create-document data3)
 ;    (clouchdb:create-document data4)
 ;    (clouchdb:create-document data5)
-;    (clouchdb:create-document data6)))
+;    (clouchdb:create-document data6)
+;    ;; Discussion topics
+;    (let* ((topic-id1 (clouchdb:query-document
+;                        '(:|id|)
+;                        (clouchdb:create-document topic1)))
+;           (topic-id2 (clouchdb:query-document
+;                        '(:|id|)
+;                        (clouchdb:create-document topic2)))
+;           (topic-msg `((:|type| . "topic-msg")
+;                        (:|sort| . 1)
+;                        (:|topic| . ,(car topic-id1))
+;                        (:|date| . ,(format-iso8601-date
+;                                      (make-date (- (get-universal-time) %secs-in-one-day)
+;                                                 6)))
+;                        (:|user| . "gajon")
+;                        (:|message| . "No really, how do you use this thing? I've been trying to make sense out of it but I just can't find my way around it. Is it supposed to be used by the smartest people in the world or what?  sigh...")))
+;           (topic-msg2 `((:|type| . "topic-msg")
+;                         (:|sort| . 2)
+;                         (:|topic| . ,(car topic-id1))
+;                         (:|date| . ,(format-iso8601-date (make-date (get-universal-time) 6)))
+;                         (:|user| . "gorda")
+;                         (:|message| . "Chill down dude, it's super easy. Just breath slowly, and find your inner Zen.")))
+;           (topic-msg3 `((:|type| . "topic-msg")
+;                         (:|sort| . 1)
+;                         (:|topic| . ,(car topic-id2))
+;                         (:|date| . ,(format-iso8601-date (make-date (get-universal-time) 6)))
+;                         (:|user| . "gajon")
+;                         (:|message| . "Make up the rules for me to live by Rules you break and just let it slide You try and find you inside of me Be as great as you want me to be Hypocrite, the word that fits Do as you say Not as you do You're pushing me to a breakpoint Pushing me, push, push me to a breakpoint"))))
+;      (clouchdb:create-document topic-msg)
+;      (clouchdb:create-document topic-msg2)
+;      (clouchdb:create-document topic-msg3))))
 ;
 ;(defun %%delete-users () 
 ;  (let* ((view-results (clouchdb:invoke-view "users" "all-users"))
@@ -490,7 +598,24 @@ a little bit:
 ;    (clouchdb:bulk-document-update
 ;      (mapcar #'clouchdb:as-deleted-document tasks))))
 ;
+;(defun %%delete-topics ()
+;  (let* ((view-results (clouchdb:invoke-view "community" "all-topics"))
+;         (topics (clouchdb:query-document
+;                   `(:|rows| :|id| ,#'clouchdb:get-document) view-results)))
+;    (clouchdb:bulk-document-update
+;      (mapcar #'clouchdb:as-deleted-document topics))))
+;
+;(defun %%delete-topic-messages ()
+;  (let* ((view-results (clouchdb:invoke-view
+;                         "community" "topic-messages-ordered"))
+;         (messages (clouchdb:query-document
+;                     `(:|rows| :|id| ,#'clouchdb:get-document) view-results)))
+;    (clouchdb:bulk-document-update
+;      (mapcar #'clouchdb:as-deleted-document messages))))
+;
 ;(defun %%delete-test-documents ()
 ;  (%%delete-users)
-;  (%%delete-tasks))
+;  (%%delete-tasks)
+;  (%%delete-topics)
+;  (%%delete-topic-messages))
 ;

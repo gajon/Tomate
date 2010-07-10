@@ -55,6 +55,22 @@
         (reduce #'+ (extract-estimations (task-estimations task)))))
 
 
+(defclass topic ()
+  ((_id   :initarg :id    :reader topic-id)
+   (_rev  :initarg :rev   :reader topic-rev)
+   (board :initarg :board :reader topic-board)
+   (title :initarg :title :reader topic-title)
+   (date  :initarg :date  :reader topic-date)
+   (user  :initarg :user  :reader topic-user)))
+
+(defclass topic-msg ()
+  ((_id     :initarg :id      :reader topic-msg-id)
+   (_rev    :initarg :rev     :reader topic-msg-rev)
+   (topic   :initarg :topic   :reader topic-msg-topic)
+   (date    :initarg :date    :reader topic-msg-date)
+   (user    :initarg :user    :reader topic-msg-user)
+   (message :initarg :message :reader topic-msg-message)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Methods to get a nice REPL display.
 
@@ -74,6 +90,30 @@
                 (task-tags task)
                 year month day)))))
 
+(defmethod print-object ((topic topic) stream)
+  (print-unreadable-object (topic stream :identity t :type t)
+    (let ((date (parse-iso8601-date (topic-date topic))))
+      (multiple-value-bind (s m h day month year)
+          (decode-universal-time (date-universal-time date)
+                                 (date-time-zone date))
+        (declare (ignore s m h))
+        (format stream "~a [~4,'0d-~2,'0d-~2,'0d]"
+                (topic-title topic)
+                year month day)))))
+
+(defmethod print-object ((msg topic-msg) stream)
+  (print-unreadable-object (msg stream :identity t :type t)
+    (let ((date (parse-iso8601-date (topic-msg-date msg))))
+      (multiple-value-bind (s m h day month year)
+          (decode-universal-time (date-universal-time date)
+                                 (date-time-zone date))
+        (declare (ignore s m h))
+        (format stream "~a [~4,'0d-~2,'0d-~2,'0d] ~a..."
+                (topic-msg-user msg)
+                year month day
+                (subseq (topic-msg-message msg)
+                        0
+                        (min (length (topic-msg-message msg)) 20)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Formatted Data
