@@ -401,11 +401,12 @@ section.add-task {
 
 /* Community {{{1 */
 
-#community {
+#community-board-selection {
 	clear:both;
-	float: left;
-	margin-top: 1em !important;
-	width: 100%;
+	padding: 1em 5px;
+	background-color: #e6eeee;
+	border-bottom: 1px solid #666;
+	width: 746px;
 }
 
 /* The list of topics in a board */

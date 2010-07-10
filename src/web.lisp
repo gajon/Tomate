@@ -686,26 +686,21 @@
 ;;; COMMUNITY
 
 (define-url-fn community
-  (let* ((board (or (parameter "board") 1))
+  (let* ((board (max (parse-int-force-pos-or-zero (parameter "board")) 1))
          (topics (get-all-topics board)))
     (standard-page (:title "Community discussion boards"
                     :active-tab :community)
-      ;;
-      ;; Board selection
-      ;;
-      (:section :id "community"
-        (:h1 "Community discussion boards (select one to view its topics).")
-        (:div :class "boards"
-          "General discussions" " | "
-          (:a :href "#" "Ideas or suggestions") " | "
-          (:a :href "#" "Problems and bug reports")))
+      (display-board-selection)
       ;;
       ;; List of topics
       ;;
       (:section :id "community-topics"
         (show-all-messages)
         (:div :class "title"
-          (:h1 "Topics (general discussions):")
+          (case board
+            (1 (htm (:h1 "General discussions:")))
+            (2 (htm (:h1 "Ideas or suggestions:")))
+            (3 (htm (:h1 "Problems and bug reports:"))))
           (:a :href (str (format nil "/community-new-topic/?board=~a" board))
               "Create new topic"))
         (loop for topic in topics
@@ -742,15 +737,7 @@
           (redirect (format nil "/community-topic/?topic=~a" topic-id)))))
     (standard-page (:title "Community discussion boards"
                     :active-tab :community)
-      ;;
-      ;; Board selection   TODO: Abstract it out
-      ;;
-      (:section :id "community"
-        (:h1 "Community discussion boards (select one to view its topics).")
-        (:div :class "boards"
-          "General discussions" " | "
-          (:a :href "#" "Ideas or suggestions") " | "
-          (:a :href "#" "Problems and bug reports")))
+      (display-board-selection)
       ;;
       ;; The topic and its messages
       ;;
@@ -779,19 +766,24 @@
 (define-url-fn community-new-topic
   (standard-page (:title "Community discussion boards"
                   :active-tab :community)
-    (:section :id "community"
-      (show-all-messages)
-      (:h1 "Community discussion boards (select one to view its topics).")
-      (:div :class "boards"
-        "General discussions" " | "
-        (:a :href "#" "Ideas or suggestions") " | "
-        (:a :href "#" "Problems and bug reports")))
+    (display-board-selection)
     (:section :id "community-new-topic"
+      (show-all-messages)
       (:h1 "Create a new topic")
       (:form :method "post" :action "."
         (:div (text-input "Title:" "title"))
         (:div (text-area "Message:" "message"))
         (:div (submit-button "Save"))))))
+
+(defun display-board-selection ()
+  (with-html-output (*standard-output*)
+    (:section :id "community-board-selection"
+      (:h1 "Community discussion boards (select one to view its topics).")
+      (:div :class "boards"
+        (:a :href "/community/?board=1" "General discussions") " | "
+        (:a :href "/community/?board=2" "Ideas or suggestions") " | "
+        (:a :href "/community/?board=3" "Problems and bug reports")))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; TESTING
