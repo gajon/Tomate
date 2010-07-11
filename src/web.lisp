@@ -823,6 +823,40 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; FOOTER PAGES
+
+(define-url-fn updates
+  (standard-page (:title "Updates")
+    (:section :id "updates"
+      (:h1 "Updates")
+      (:p "If you are a programmer or just curious enough, you can also see
+          the whole source code of this application and the changesets at
+          its Mercurial repository at "
+          (:a :href "http://bitbucket.org/gajon/tomate/changesets"
+              :target "_blank" "http://bitbucket.org/gajon/tomate/changesets"))
+      (:div :class "updates"
+        (:h2 "2010-07-10")
+        (:ul
+          (:li "Added the discussion forums under the "
+               (:a :href "/community/" "community") " tab.")
+          (:li "It's possible to use your full name, if you wish to do so, for
+          the discussion forums.")))
+      (:div :class "updates"
+        (:h2 "2010-07-07")
+        (:ul
+          (:li "Added the first two charts under the "
+               (:a :href "/reports/" "reports") " tab. There's still a lot to
+               do; the intention is to be able to select the charts that you
+               would like to see and customize them.")))
+      (:div :class "updates"
+        (:h2 "2010-07-06")
+        (:ul
+          (:li "We are live at pomolog.com!"))))))
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; TESTING
 
 ;(define-url-fn testing

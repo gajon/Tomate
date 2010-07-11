@@ -134,8 +134,13 @@ BE CAREFUL."
                         (:li :class "notab" (:a :href "/logout/" "Logout"))))))
            (:div :id "content"
                  ,@body)
-           (:footer
-             (:p "Powered by Common Lisp")))))))
+           ,(when show-banner
+              `(:footer
+                 (:p 
+                   (:a :href "/updates/" "UPDATES") " | "
+                   (:a :href "/about/" "About this") " | "
+                   (:a :href "/credits/" "Credits") " | "
+                   "Powered by Common Lisp"))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; QUEUE AND SHOW ERROR/SUCCESS MESSAGES TO THE USER

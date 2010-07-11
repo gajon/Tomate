@@ -493,11 +493,33 @@ section.add-task {
 	clear: both;
 }
 
+/* Updates {{{1 */
+
+#updates {
+	clear: both;
+	float: left;
+	margin-top: 1em !important;
+}
+
+#updates h1 { margin-bottom: 0.8em; }
+#updates p { margin-bottom: 2em; color: #666; }
+#updates div.updates { margin-bottom: 2em;}
+#updates div.updates li {
+	margin-left: 3em;
+}
+
+
 /* Footer {{{1 */
 
 footer {
 	clear: both;
+	text-align: center;
+	padding: 2em 0;
 }
+footer, footer a {
+	color: #aaa;
+}
+
 
 
 /* vim: set sw=4 ts=4 noet foldmethod=marker: */
