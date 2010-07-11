@@ -100,9 +100,10 @@
                  (:div (password-input "Password:" "password"))
                  (:div (submit-button "Login"))
                  (:div (:p (:a :href "/register/"
-                               :class "new-account" "New account?")
-                           (:br "It's 100% free and only takes 30 seconds. "
-                                "No email required")))))
+                               :class "new-account" "Create new account")
+                           (:br)
+                           "It's 100% free and only takes 30 seconds. "
+                           "No email required"))))
         ;; End login form
         #>END_OF_HTML
         <h1>Are you using the Pomodoro Technique?</h1>
@@ -123,8 +124,7 @@
 
         <p>At the end of the day, week or month (whenever you want) log in
         and record the total number of pomodoros you achieved. It's that
-        simple!. This is <strong>not</strong> a planning tool, a piece of
-        paper is better for that.</p>
+        simple!</p>
         END_OF_HTML)
 
       (:section :id "login-text3"
@@ -165,7 +165,7 @@
       (:section :id "login-text5"
         #>END_OF_HTML
         <p>You can learn more about the technique, read the book from the
-        original author, and download other resources at its web page:</p>
+        original author and download other resources from its web page:</p>
         <p><a href="http://www.pomodorotechnique.com/">
         http://www.pomodorotechnique.com/</a></p>
         END_OF_HTML))))

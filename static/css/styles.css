@@ -292,17 +292,18 @@ section.add-task {
 	padding: 1em;
 }
 #login h1 {
-	font-size: 1.8em !important;
+	font-size: 2.8em !important;
 	margin-bottom: 0.6em;
-	line-height: 1.3em;
+	line-height: 1.0em;
 	text-shadow: 1px 1px 1px #fff !important;
 }
 #login h2 {
-	font-size: 1.3em !important;
-	margin-bottom: 0.6em;
+	font-size: 2em !important;
+	margin-bottom: 0.4em;
+	line-height: 1.0em;
 	text-shadow: 1px 1px 1px #fff !important;
 }
-#login p { margin-bottom: 0.6em; }
+#login p { margin-bottom: 0.6em; font-size: 1.3em; line-height: 1.2em; }
 #login blockquote { font-style:italic; }
 
 /*http://www.colourlovers.com/palette/92095/Giant_Goldfish*/
@@ -316,7 +317,6 @@ section.add-task {
 #login-text4 a, #login-text5 a { color: #fff; text-decoration:underline; }
 
 #login-text4 h1 { text-shadow: 1px 1px 1px #000 !important; }
-#login-text5 { padding-right: 330px !important; }
 
 /* Register a new account {{{1 */
 
