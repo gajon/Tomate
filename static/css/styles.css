@@ -493,20 +493,25 @@ section.add-task {
 	clear: both;
 }
 
-/* Updates {{{1 */
+/* Updates and About pages {{{1 */
 
-#updates {
+#updates, #about {
 	clear: both;
 	float: left;
 	margin-top: 1em !important;
 }
 
-#updates h1 { margin-bottom: 0.8em; }
+#updates h1, #about h1 { margin-bottom: 0.8em; }
 #updates p { margin-bottom: 2em; color: #666; }
+#about p   { margin-bottom: 1.5em; width: 60%; }
+
 #updates div.updates { margin-bottom: 2em;}
-#updates div.updates li {
+#updates div.updates li, #about li {
 	margin-left: 3em;
+	width: 60%;
 }
+
+#about ul { margin-bottom: 1.5em; }
 
 
 /* Footer {{{1 */
