@@ -204,7 +204,23 @@
         (:div (password-input "Password:" "password"))
         (:div (password-input "Re-type:" "password2"))
         (:div (submit-button "Create")
-              (:a :href "/" "go back"))))))
+              (:a :href "/" "go back"))))
+    (:section :id "register-terms"
+      (:div (:p (:strong "I promise you this:")))
+      (:div (:ul
+              (:li "I'll NEVER use, sell, spy on, trade, or disseminate your
+                   information. I truly respect your privacy.")
+              (:li "You'll always be able to download your records to your
+                   computer; your information is yours, and I'll never lock
+                   you here.")))
+      (:div (:p (:strong "And you promise me this:")))
+      (:div (:ul
+              (:li "Don't use the community forums to send unsolicited
+                   information to others (e.g. Spam).")
+              (:li "Don't attempt to violate the security of this application
+                   or do anything with the intention of accessing the
+                   information of other users.")
+              (:li "Be nice to others :)"))))))
 
 (defun process-register-new-account ()
   (let ((username (trim-or-nil (post-parameter "username")))
