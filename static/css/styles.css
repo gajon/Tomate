@@ -493,17 +493,18 @@ section.add-task {
 	clear: both;
 }
 
-/* Updates and About pages {{{1 */
+/* Updates, About and Credits pages {{{1 */
 
-#updates, #about {
+#updates, #about, #credits {
 	clear: both;
 	float: left;
 	margin-top: 1em !important;
 }
 
-#updates h1, #about h1 { margin-bottom: 0.8em; }
+#updates h1, #about h1, #credits h1 { margin-bottom: 0.8em; }
 #updates p { margin-bottom: 2em; color: #666; }
 #about p   { margin-bottom: 1.5em; width: 60%; }
+#credits p { margin-bottom: 1.5em; }
 
 #updates div.updates { margin-bottom: 2em;}
 #updates div.updates li, #about li {
@@ -512,6 +513,17 @@ section.add-task {
 }
 
 #about ul { margin-bottom: 1.5em; }
+
+
+#credits {
+	width: 500px;
+}
+#credits-logos {
+	float: left;
+	width: 250px;
+	margin-top: 3em !important;
+	text-align: center;
+}
 
 
 /* Footer {{{1 */

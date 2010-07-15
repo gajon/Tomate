@@ -916,6 +916,45 @@
           \"Business proposition\" or your email will go straight to the
           trash can."))))
 
+(define-url-fn credits
+  (standard-page (:title "Credits"
+                  :active-tab :community)
+    (:section :id "credits"
+      (:h1 "Credits")
+      (:p #"This application was developed with <a target="_blank"
+          href="http://en.wikipedia.org/wiki/Common_Lisp">ANSI Common Lisp</a>,
+          using <a href="http://www.sbcl.org/" target="_blank">Steel Bank
+          Common Lisp</a> (SBCL) for compiling it."#)
+      (:p #"This runs atop <a href="http://weitz.de/hunchentoot/"
+          target="_blank">Hunchentoot</a>, a web server also written in Common
+          Lisp by Edi Weitz. Another piece of <em>Ediware</em> being used is
+          <a href="http://weitz.de/cl-who/" target="_blank">CL-WHO</a> which
+          lets you convert Lisp S-Expressions into (X)HTML code."#)
+      (:p #"<a target="_blank" href="http://couchdb.apache.org/">CouchDB</a>
+          is a document-oriented database used by this application for data
+          storage and retrieval. To talk to CouchDB from Common Lisp, I use a
+          library by Peter Eddy called <a target="_blank" 
+          href="http://common-lisp.net/project/clouchdb/">clouchdb</a>."#)
+      (:p #"My favorite editor is <a target="_blank" href="http://www.vim.org/">
+          Vim</a>, which I've been using for years."#)
+      (:p #"My operating system of choice is <a href="http://slackware.com/"
+          target="_blank">Slackware GNU/Linux</a>, which I use in my workstation
+          as well as in the server this application runs on."#)
+      (:h1 "This application's source code is available")
+      (:p "If you are a programmer or are curious enough, you can get the
+          complete source code of this application from it's Mercurial
+          repository, located at:")
+      (:p (:a :href "http://bitbucket.org/gajon/tomate/" :target "_blank"
+              "http://bitbucket.org/gajon/tomate/"))
+      (:p "It is released under an MIT license.")
+      (:p "Keep in mind that this is my very first application in Common Lisp,
+          and I still need to gain more experience with it. It is a completely
+          different beast when compared with most popular languages like Java,
+          C# and even Python. What I'm trying to say is that if you are trying
+          to learn something from it be very critical of what you see. You
+          should always do that anyways."))
+      (:section :id "credits-logos"
+        (:img :src "/static/logos.jpg" :alt "logos"))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
