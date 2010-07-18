@@ -3,7 +3,7 @@
 body {
 	color: #333;
 	background: #fff;
-	font: normal 75% 'Trebuchet MS',Verdana,Helvetica,sans-serif;
+	font: normal 12px Arial,Helvetica,sans-serif;
 	line-height: 1.6;
 }
 
@@ -195,7 +195,7 @@ section.listing .task-name {
 }
 section.listing .task-tags {
 	color: #080;
-	font-style: italic;
+	/*font-style: italic;*/
 	line-height: 1.0em;
 	padding-bottom: 0.4em;
 }
