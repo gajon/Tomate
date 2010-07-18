@@ -274,7 +274,7 @@
       (:section :id "day-navigation"
         (:div :id "previousday"
               (:p (:a :href (conc (format nil "?d=~a" (format-date yesterday)))
-                      "<< Previous day")))
+                      "&lt;&lt; Previous day")))
         (:div :id "location"
               (:h1 (esc location) ", " (esc (format-date today :longform t)))
               (:p "Record sheet"
@@ -285,7 +285,7 @@
                            "[location]")))
         (:div :id "nextday"
               (:p (:a :href (conc (format nil "?d=~a" (format-date tomorrow)))
-                      "Next day >>"))))
+                      "Next day &gt;&gt;"))))
       ;;
       ;; This div is used to change the location, it is displayed
       ;; when the button defined above is clicked on.
@@ -739,7 +739,7 @@
             (1 (htm (:h1 "General discussions:")))
             (2 (htm (:h1 "Ideas or suggestions:")))
             (3 (htm (:h1 "Problems and bug reports:"))))
-          (:a :href (str (format nil "/community-new-topic/?board=~a" board))
+          (:a :href (format nil "/community-new-topic/?board=~a" board)
               "Create new topic"))
         (loop for topic in topics
               for topic-id = (topic-id topic)
