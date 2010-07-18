@@ -376,7 +376,26 @@
           (text-input nil "estimations" :default-value "Estimations")
           (text-input nil "real" :default-value "Real"))
         (:div (text-input nil "tags" :default-value "List of tags")
-              (submit-button "Add record"))))))
+              (submit-button "Add record"))
+        (:div :class "help-toggle"
+          (:p (:a :id "help-toggle" :href "#" "Show help.")))
+        (:div :class "help hidden"
+          (:p "The task description is free form, you can enter whatever you
+              want there.")
+          (:p "The estimations are a series of numbers separated by the plus
+              (+) sign; for example, \"3+2\" means that your first
+              estimation was 3 pomodoros, but after that you re-estimated
+              2 more pomodoros to finish the task.")
+          (:p "The next field is for the actual number of pomodoros that you
+              spent on this task, which could be less than your estimations.")
+          (:p "Finally you can enter a comma separated list of tags related
+              to this task. This will help you see in the reports how you
+              spend your time among different types of activities. For example
+              I use the list of tags \"projects, pomolog, programming\" for 
+              tasks involving the development of this web application, and
+              \"books, entertainment\" for leisure reading while \"books,
+              learning\" for technical books."))))
+    (:script "$('#help-toggle').click(function(){$('.help').toggle();});")))
 
 (defun process-add-new-task (the-user today)
   (let* ((task (trim-or-nil (post-parameter "task")))

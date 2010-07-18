@@ -250,6 +250,14 @@ section.add-task {
 	margin-left: 4px;
 }
 
+.add-task div.help-toggle {
+	margin: 0.5em 4px;
+}
+
+.add-task div.help p {
+	margin: 0 0 1em 4px;
+}
+
 
 /* Login form {{{1 */
 
