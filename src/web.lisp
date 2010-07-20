@@ -619,7 +619,7 @@
 
 
 (define-url-fn reports
-  (push-info-msg "This section is under development, keep looking for updates (July 6th).")
+  (push-info-msg "This section is under development, keep looking for updates.")
   (push-info-msg "And remember to visit the \"Community\" page to suggest reports you'd like to see.")
   (standard-page (:title "Reports about your data"
                   :active-tab :reports
@@ -629,11 +629,41 @@
     (:section :id "reports"
       (show-all-messages)
       (:div :class "chart"
-        (:h1 "Real number of pomodoros")
+        (:h1 "Some stats about your work")
+        (display-stats the-user))
+      (:div :class "chart"
+        (:h1 "Real number of pomodoros over the last 30 days")
         (embed-chart estimated-vs-real))
       (:div :class "chart"
         (:h1 "Tags and number of tasks for each")
         (embed-chart tags :height 500)))))
+
+(defun display-stats (the-user)
+  (multiple-value-bind (dates pomodoros tasks)
+      ;; TODO: Instead of :days 9999 make the function accept :days nil
+      (get-real-pomodoros-and-tasks-count-by-days the-user :days 9999)
+    (let* ((total-pomodoros (reduce #'+ pomodoros))
+           (total-tasks (reduce #'+ tasks))
+           (total-days (length dates))
+           (average-pomodoros (if (> total-days 0)
+                                (/ total-pomodoros total-days)
+                                0)))
+      (with-html-output (*standard-output*)
+        (:table :id "stats-table" :cellspacing 1 :cellpadding 0
+          (:tbody
+            (:tr
+              (:td "Total pomodoros:")
+              (:td :class "text-center" (str total-pomodoros)))
+            (:tr
+              (:td "Total tasks:")
+              (:td :class "text-center" (str total-tasks)))
+            (:tr
+              (:td "Days with records:")
+              (:td :class "text-center" (str total-days)))
+            (:tr
+              (:td "Average pomodoros per day:")
+              (:td :class "text-center"
+                   (fmt "~,2f" average-pomodoros)))))))))
 
 (define-url-fn ofc-test-json
   (with-html-output-to-string (*standard-output* nil :prologue nil :indent nil)

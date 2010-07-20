@@ -421,6 +421,14 @@ section.add-task {
 	margin-top: 1em !important;
 }
 
+#reports #stats-table {
+	background-color: #cdcdcd;
+	margin: 10px 0 15px;
+}
+#reports #stats-table td {
+	background-color: #fff;
+}
+
 /* Community {{{1 */
 
 #community-board-selection {
