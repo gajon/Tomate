@@ -187,6 +187,28 @@
         (setf (session-value 'authenticated) "yes"
               (session-value 'username) (user-username new-user)
               (session-value 'timezone) (user-time-zone new-user))
+        ;; Add a couple of record examples so that the new user
+        ;; has a better idea of how to start recording his own tasks.
+        (add-task
+          (make-instance 'task
+                         :name "I'm an example task record, please delete me!"
+                         :tags '("example" "work" "office")
+                         :location (user-current-location new-user)
+                         :estimations "4" :real 4
+                         :date (format-iso8601-date
+                                 (make-date (get-universal-time)
+                                            (user-time-zone new-user))))
+          new-user)
+        (add-task
+          (make-instance 'task
+                         :name "This is another example, first estimation was 3 then re-estimated 2 more pomodoros. Please delete me!"
+                         :tags '("example" "work" "estimations")
+                         :location (user-current-location new-user)
+                         :estimations "3+2" :real 4
+                         :date (format-iso8601-date
+                                 (make-date (get-universal-time)
+                                            (user-time-zone new-user))))
+          new-user)
         (redirect "/listing/"))))
   (standard-page (:title "Create a new account"
                   :show-banner nil)
