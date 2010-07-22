@@ -626,7 +626,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; REPORTS
 
-(defmacro! embed-chart (source &key (width 756) (height 300))
+(defmacro! embed-chart (source &key (width 756) (height 400))
   (let ((source (url-encode (mkstr "/ofc-test-json/?data=" source))))
     `(with-html-output (*standard-output*)
        (:script :type "text/javascript"
@@ -703,9 +703,8 @@
                           :steps 1
                           :labels (make-instance 'chart-x-axis-labels
                                                  :labels x-dates
-                                                 :visible-steps 4)))
+                                                 :rotate 270)))
                 (y-axis (make-instance 'chart-y-axis
-                                       :offset-p t
                                        :max-range 20
                                        :steps 2))
                 (x-legend (make-instance 'chart-x-legend
@@ -745,7 +744,6 @@
                                                  :size 12
                                                  :rotate 270)))
                 (y-axis (make-instance 'chart-y-axis
-                                       :offset-p t
                                        :max-range (1+ max-value)
                                        :steps 1))
                 (x-legend (make-instance 'chart-x-legend
