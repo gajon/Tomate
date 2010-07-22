@@ -308,7 +308,7 @@
                 :class "tablesorter"
                 :cellspacing 1 :cellpadding 0
           (table-columns ("Task" :style "width:100%;")
-                         "Estimations" "Real" "Difference")
+                         "Estimated" "Real" "Difference")
           (:tfoot (render-tasks-totals tasks))
           (:tbody
             (if tasks
@@ -373,7 +373,7 @@
         (hidden-input "location" :default-value location)
         (:div
           (text-input nil "task" :default-value "Task description")
-          (text-input nil "estimations" :default-value "Estimations")
+          (text-input nil "estimations" :default-value "Estimated")
           (text-input nil "real" :default-value "Real"))
         (:div (text-input nil "tags" :default-value "List of tags")
               (submit-button "Add record"))
