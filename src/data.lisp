@@ -91,7 +91,7 @@
               ;; The data comes in the following format
               ;; ((:|key| "gajon" 2010 6 11)
               ;;  (:|value| (:|totalPomodoros| . 18) (:|numTasks| . 2)))
-              (let ((date (apply #'format nil "~a/~a/~a" (cddar data)))
+              (let ((date (apply #'format nil "~a-~a-~a" (cddar data)))
                     (alist (cdadr data)))
                 (push date x-dates)
                 (push (cdr (assoc :|totalPomodoros| alist)) y-pomodoros)
