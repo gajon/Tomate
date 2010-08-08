@@ -86,7 +86,7 @@
   ;;
   ;; Render login page
   ;;
-  (standard-page (:title "Login"
+  (standard-page (:title "Pomolog.com, Record your achievements while using the Pomodoro Technique."
                   :show-banner nil
                   :js-files ("login.js"))
     (:div :id "login"
