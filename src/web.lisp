@@ -944,6 +944,12 @@
           (:a :href "http://bitbucket.org/gajon/tomate/changesets"
               :target "_blank" "http://bitbucket.org/gajon/tomate/changesets"))
       (:div :class "updates"
+        (:h2 "2010-08-08")
+        (:ul
+          (:li "Finally added the &quot;Data export&quot; feature under the "
+               (:a :href "/account/" "account") " tab. I'm sorry for the
+               big delay; I've been a little bit busy with other projects.")))
+      (:div :class "updates"
         (:h2 "2010-07-10")
         (:ul
           (:li "Added the discussion forums under the "
