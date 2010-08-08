@@ -451,13 +451,6 @@
         the-user)
       (push-success-msg "The task has been recorded."))))
 
-(defun extract-estimations (estimations)
-  (mapcar #'parse-int-force-pos-or-zero
-          (split-sequence #\+
-                          ;; Anything that's not a digit is replaced by +
-                          (#~s/[^\d+]/+/ estimations)
-                          :remove-empty-subseqs t)))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; EDIT A TASK
@@ -595,7 +588,37 @@
           (:div (password-input "Current:" "password"))
           (:div (password-input "New password:" "new-password"))
           (:div (password-input "Confirm:" "new-password2"))
-          (:div (submit-button "Change")))))))
+          (:div (submit-button "Change")))))
+    (:section :id "account-download-data"
+      (:h1 "Download your records:")
+      (:div
+        (:form :method "post" :action "/download-data/"
+          (:div
+            (:label :for "id_download_fmt" "File format:")
+            (:select :id "id_download_fmt"
+                     :name "download_fmt"
+                     (:option :value "csv" "CSV (comma separated values)")))
+          (:div (submit-button "Download"))
+          (:div :class "help"
+            (:p "For the moment there's only CSV format. To open the
+                downloaded file you can use a program like MS Excel,
+                OpenOffice.org or similar.")
+            (:p "Sometimes when you directly open the file with MS Excel, it
+                won't recognize the character set and display junk. To fix
+                that open a blank spreadsheet and then look for an option to
+                insert external data from a file. Select the downloaded file
+                and when prompted indicate that the file uses UTF-8 for
+                encoding, and that the fields are separated by commas and
+                surrounded by double quotes (&quot;).")))))))
+
+(define-url-fn download-data
+  (unless (eql :post (request-method*))
+    (redirect "/account/"))
+  ;; TODO: We only have CSV for now.
+  (let ((file (export-data the-user)))
+    (setf (hunchentoot:header-out :content-disposition)
+          (format nil "attachment; filename=\"~a\"" (file-namestring file)))
+    (hunchentoot:handle-static-file file)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

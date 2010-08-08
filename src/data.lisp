@@ -367,6 +367,68 @@ a little bit:
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; EXPORT DATA
+
+;; TODO: We only have CSV for now.
+(defun export-data (user &key (fmt :csv) (header t))
+  (let* ((user (if (eq (type-of user) 'user) (user-username user) user))
+         (tasks
+           (clouchdb:query-document
+             `(:|rows| :|id| ,#'clouchdb:get-document)
+             (clouchdb:invoke-view "tasks" "tasks-by-date"
+                                   :start-key (list user)
+                                   :end-key (list user (make-hash-table))))))
+    (when tasks
+      (cond ((eq fmt :csv)
+             ;; TODO: Is it a big deal if there's a collision? Not many
+             ;; people would be exporting their data at the same time.
+             ;; More important is that we are using an unexposed
+             ;; Hunchentoot function.
+             (let ((file
+                     (merge-pathnames
+                       (format nil "~a.csv" (hunchentoot::create-random-string))
+                       *data-dumps-home*)))
+               (export-data-as-csv tasks header file)
+               file))))))
+
+(defun export-data-as-csv (tasks header file)
+  (let ((replacer #~s/"/""/))  ;")) Vim goes nuts by the imbalanced quotes
+    (flet ((write-field (fld stream &key last)
+                        (unless (null fld)
+                          (write-char #\" stream)
+                          (write-string
+                            (funcall replacer (or (and (stringp fld) fld)
+                                                  (mkstr fld)))
+                            stream)
+                          (write-char #\" stream))
+                        (if last
+                          (terpri stream)
+                          (write-char #\, stream))))
+      ;; There's no locking, although the filename is randomly generated.
+      ;; Anyway, be careful in the future.
+      (with-open-file (stream file
+                              :direction :output
+                              :if-does-not-exist :create
+                              :if-exists :supersede)
+        (when header
+          (write-string "Date,Task,Location,Estimations,Total Est.,Real,Tags"
+                        stream)
+          (terpri stream))
+        (dolist (alist tasks)
+          (write-field (%couchdb-field date alist) stream)
+          (write-field (%couchdb-field name alist) stream)
+          (write-field (%couchdb-field location alist) stream)
+          (write-field (%couchdb-field estimations alist) stream)
+          (write-field (reduce #'+ (extract-estimations
+                                     (%couchdb-field estimations alist)))
+                       stream)
+          (write-field (%couchdb-field real alist) stream)
+          (write-field (format nil "~{~a~^, ~}" (%couchdb-field tags alist))
+                       stream
+                       :last t))))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; UTILITIES TO SETUP THE COUCHDB DATABASE, MAINLY THE
 ;;; DESIGN VIEWS.
 

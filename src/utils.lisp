@@ -456,6 +456,14 @@ number. The function accepts the same arguments as `parse-integer`, except for
 ;(mapcar #'parse-int-force-pos-or-zero
 ;        (list "" nil "haosd" "1" "0" "23" "-12" "-1" "-0"))
 
+(defun extract-estimations (estimations)
+  (mapcar #'parse-int-force-pos-or-zero
+          (split-sequence #\+
+                          ;; Anything that's not a digit is replaced by +
+                          (#~s/[^\d+]/+/ estimations)
+                          :remove-empty-subseqs t)))
+
+
 ;;; From Paul Graham's On Lisp, pg. 47.
 (defun filter (fn lst)
   "You give FILTER a function and a list, and get back a list of whatever

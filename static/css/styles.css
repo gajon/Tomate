@@ -371,15 +371,18 @@ section.add-task {
 
 /* Account settings {{{1 */
 
+/* TODO: This is stupid! */
 #account-settings,
-#account-change-password {
+#account-change-password,
+#account-download-data {
 	clear:both;
 	float: left;
 	margin-top: 1em !important;
 	width: 100%;
 }
 #account-settings label,
-#account-change-password label {
+#account-change-password label,
+#account-download-data label {
 	display: block;
 	float: left;
 	font-weight: bold;
@@ -387,12 +390,14 @@ section.add-task {
 	padding: 4px 0px;
 	margin: 1px 0;
 }
-#account-settings em {
+#account-settings em,
+#account-download-data div.help p {
 	display:block;
 	margin-left: 9em;
 	margin-bottom: 0.5em;
 	width: 400px;
 	color: #666;
+	font-style: italic;
 }
 #account-settings input,
 #account-change-password input {
@@ -403,12 +408,14 @@ section.add-task {
 	width: 200px;
 }
 #account-settings button,
-#account-change-password button {
+#account-change-password button,
+#account-download-data button {
 	margin: 2px 0px;
 	margin-left: 9em;
 }
 #account-settings div,
-#account-change-password div {
+#account-change-password div,
+#account-download-data div {
 	clear: both;
 }
 

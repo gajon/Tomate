@@ -26,8 +26,8 @@
 
 (defvar *server-port* 8080)
 (defvar *webapp-home* *default-pathname-defaults*)
-(defvar *template-directory* (merge-pathnames "templates/" *webapp-home*))
 (defvar *static-web-files* (merge-pathnames "static/" *webapp-home*))
+(defvar *data-dumps-home* (merge-pathnames "data-dumps/" *webapp-home*))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Other Hunchentoot Settings
