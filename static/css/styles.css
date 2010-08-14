@@ -12,18 +12,12 @@ a:focus, a:hover { color: #f00; text-decoration: underline; }
 
 h1 { text-shadow: 2px 2px 2px #ccc; }
 
-td,th {
-	padding: 0 0.5em;
-}
-
+td,th { padding: 0 0.5em; }
 small { font-size: 80% }
-
 .left { float:left; }
 .right { float:right; }
 .text-center { text-align:center; }
-
 .hidden { display:none; }
-
 
 /* Body Container {{{1 */
 
@@ -41,20 +35,17 @@ nav {
 	background:#DAE0D2 url("banner2.jpg") repeat-x bottom;
 	line-height:normal;
 }
-
 nav ul {
 	margin:0;
 	padding:66px 10px 0;
 	list-style:none;
 }
-
 nav li {
 	float:left;
 	background:url("left.gif") no-repeat left top;
 	margin:0;
 	padding:0 0 0 9px;
 }
-
 nav a, nav strong, nav span {
 	display:block;
 	background:url("right.gif") no-repeat right top;
@@ -62,43 +53,27 @@ nav a, nav strong, nav span {
 	text-decoration:none;
 	color:#666;
 }
-nav a:hover {
-	color:#333;
-}
-
-nav .current {
-	background-image:url("left_on.gif");
-}
-
+nav a:hover { color:#333; }
+nav .current { background-image:url("left_on.gif"); }
 nav .current a {
 	background-image:url("right_on.gif");
 	padding-bottom:5px;
 	color:#000;
 }
-
 nav li.notab, nav li.notab a, nav li.notab span {
 	background:none !important;
 	color: #000;
 }
-nav li.notab a {
-	color: #00f; text-decoration: none;
-}
+nav li.notab a { color: #00f; text-decoration: none; }
 nav li.notab a:focus, nav li.notab a:hover {
 	color: #f00; text-decoration: underline;
 }
 
+/* Content / Section {{{1 */
 
-/* Content {{{1 */
+#content { clear: both; }
 
-#content {
-	clear: both;
-}
-
-/* Section {{{1 */
-
-#content section {
-	margin-bottom: 2em;
-}
+#content section { margin-bottom: 2em; }
 
 #content section h1 {
 	font-size: 1.3em;
@@ -107,10 +82,7 @@ nav li.notab a:focus, nav li.notab a:hover {
 
 /* Messages and Errors {{{1 */
 
-#errors li, #messages li, #success li {
-	/*margin: 0 1.5em;*/
-	list-style-type:none;
-}
+#errors li, #messages li, #success li { list-style-type:none; }
 #errors, #messages, #success {
 	clear: both;
 	padding:.5em !important;
@@ -120,9 +92,7 @@ nav li.notab a:focus, nav li.notab a:hover {
 	font-weight:bold;
 	text-shadow: 1px 1px 1px #000;
 }
-#messages {
-	text-shadow: 1px 1px 1px #ccc !important;
-}
+#messages { text-shadow: 1px 1px 1px #ccc !important; }
 #errors {background:#f62626; color:#fff; border-color:#bd0e0e;}
 #messages {background:#fffcc4; border-color:#f5d34e;}
 #success {background:#3aa33a; color:#fff; border-color:#507d50;}
@@ -175,9 +145,7 @@ nav li.notab a:focus, nav li.notab a:hover {
 
 /* Listing of tasks {{{1 */
 
-section.listing {
-	clear: both;
-}
+section.listing { clear: both; }
 
 section.listing header {
 	line-height: 1.3em;
@@ -195,14 +163,10 @@ section.listing .task-name {
 }
 section.listing .task-tags {
 	color: #080;
-	/*font-style: italic;*/
 	line-height: 1.0em;
 	padding-bottom: 0.4em;
 }
-
-section.listing span.edit {
-	padding-left: 1em;
-}
+section.listing span.edit { padding-left: 1em; }
 
 section.listing td { vertical-align:middle; }
 section.listing tfoot th { text-align:center; }
@@ -224,7 +188,6 @@ section.add-task {
 	background-color: #fff;
 	border: 1px solid #8dbdd8;
 }
-
 .add-task input.focused {
 	font-style:normal;
 	color:#000;
@@ -234,32 +197,35 @@ section.add-task {
 	color:#6f6f6f;
 }
 
-.add-task #id_task {
-	width: 203px;
-}
-.add-task #id_estimations {
-	width: 96px;
-}
-.add-task #id_real {
-	width: 48px;
-}
-.add-task #id_tags {
-	width: 383px;
-}
-.add-task #id_submit {
-	margin-left: 4px;
-}
+.add-task #id_task { width: 203px; }
+.add-task #id_estimations { width: 96px; }
+.add-task #id_real { width: 48px; }
+.add-task #id_tags { width: 383px; }
+.add-task #id_submit { margin-left: 4px; }
 
-.add-task div.help-toggle {
-	margin: 0.5em 4px;
-}
-
-.add-task div.help p {
-	margin: 0 0 1em 4px;
-}
-
+.add-task div.help-toggle { margin: 0.5em 4px; }
+.add-task div.help p { margin: 0 0 1em 4px; }
 
 /* Login form {{{1 */
+
+#login section {
+	margin: 0 0 0 0 !important;
+	padding: 1em;
+}
+#login h1 {
+	font-size: 2.8em !important;
+	margin-bottom: 0.6em;
+	line-height: 1.0em;
+	text-shadow: 1px 1px 1px #fff !important;
+}
+#login h2 {
+	font-size: 2em !important;
+	margin-bottom: 0.4em;
+	line-height: 1.0em;
+	text-shadow: 1px 1px 1px #fff !important;
+}
+#login p { margin-bottom: 0.6em; font-size: 1.3em; line-height: 1.2em; }
+#login blockquote { font-style:italic; }
 
 #login-form {
 	float: right;
@@ -289,30 +255,11 @@ section.add-task {
 	width: 200px;
 }
 #login-form button { margin-left: 114px; }
-#login-form p { margin-left: 114px; line-height: 1.3em; }
+#login-form p { margin: 0 0 0.6em 114px; }
 #login-form #errors {
 	width: 330px !important;
 	margin: 0 auto;
 }
-
-#login section {
-	margin: 0 0 0 0 !important;
-	padding: 1em;
-}
-#login h1 {
-	font-size: 2.8em !important;
-	margin-bottom: 0.6em;
-	line-height: 1.0em;
-	text-shadow: 1px 1px 1px #fff !important;
-}
-#login h2 {
-	font-size: 2em !important;
-	margin-bottom: 0.4em;
-	line-height: 1.0em;
-	text-shadow: 1px 1px 1px #fff !important;
-}
-#login p { margin-bottom: 0.6em; font-size: 1.3em; line-height: 1.2em; }
-#login blockquote { font-style:italic; }
 
 /*http://www.colourlovers.com/palette/92095/Giant_Goldfish*/
 #login-form { color: #fff; }
@@ -360,12 +307,7 @@ section.add-task {
 	width: 400px !important;
 	margin: 0 auto;
 }
-
-#register-terms li {
-	margin-left: 3em;
-	/*width: 60%;*/
-}
-
+#register-terms li { margin-left: 3em; }
 #register-terms ul { margin-bottom: 1.5em; }
 
 
@@ -419,7 +361,6 @@ section.add-task {
 	clear: both;
 }
 
-
 /* Reports {{{1 */
 
 #reports {
@@ -427,14 +368,11 @@ section.add-task {
 	float: left;
 	margin-top: 1em !important;
 }
-
 #reports #stats-table {
 	background-color: #cdcdcd;
 	margin: 10px 0 15px;
 }
-#reports #stats-table td {
-	background-color: #fff;
-}
+#reports #stats-table td { background-color: #fff; }
 
 /* Community {{{1 */
 
@@ -456,22 +394,15 @@ section.add-task {
 	line-height: 2em;
 	margin-left: 2em;
 }
-
 #community-topics div.topic {
 	clear: both;
 	margin-top: 1em;
 }
-#community-topics div.topic em {
-	margin-left: 2em;
-}
+#community-topics div.topic em { margin-left: 2em; }
 
 /* For a single topic and the messages within it */
-#community-topic {
-	width: 600px;
-}
-#community-topic div.message {
-	margin-top: 1em;
-}
+#community-topic { width: 600px; }
+#community-topic div.message { margin-top: 1em; }
 #community-topic div.signature {
 	text-align: right;
 	font-style: italic;
@@ -490,9 +421,7 @@ section.add-task {
 }
 
 /* For posting a new topic */
-#community-new-topic h1 {
-	margin-bottom: 1em;
-}
+#community-new-topic h1 { margin-bottom: 1em; }
 #community-new-topic textarea {
 	padding: 4px;
 	margin: 2px 0px;
@@ -519,9 +448,7 @@ section.add-task {
 	margin: 2px 0px;
 	margin-left: 7em;
 }
-#community-new-topic div {
-	clear: both;
-}
+#community-new-topic div { clear: both; }
 
 /* Updates, About and Credits pages {{{1 */
 
@@ -551,16 +478,13 @@ section.add-task {
 #about ul { margin-bottom: 1.5em; }
 
 
-#credits {
-	width: 500px;
-}
+#credits { width: 500px; }
 #credits-logos {
 	float: left;
 	width: 250px;
 	margin-top: 3em !important;
 	text-align: center;
 }
-
 
 /* Footer {{{1 */
 
@@ -569,10 +493,6 @@ footer {
 	text-align: center;
 	padding: 2em 0;
 }
-footer, footer a {
-	color: #aaa;
-}
-
-
+footer, footer a { color: #aaa; }
 
 /* vim: set sw=4 ts=4 noet foldmethod=marker: */
