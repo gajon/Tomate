@@ -44,6 +44,7 @@
            (redirect "/"))
          ;;
          ;; Yay, we have a valid user, let's set the time zone.
+         ;; TODO: Why are we setfing the user-time-zone?
          (let ((time-zone (setf (user-time-zone the-user)
                                 (session-value 'timezone))))
            (declare (ignorable time-zone))
@@ -56,14 +57,21 @@
 ;;; TODO: there should be a way to combine these `define-*-fn` macros
 ;;;       into a single one.
 (defmacro define-open-url-fn (name &body body)
-  "This macro is like `define-url-fn` macro but does not try to see
-if there's a valid session. The variables `the-user` and `time-zone` are
-still being inserted into the lexical context but their values are nil.
+  "This macro is like `define-url-fn` macro but does not enforce a valid
+session. The variables `the-user` and `time-zone` are still being inserted
+into the lexical context but their values may be nil.
 BE CAREFUL."
   `(progn
      (defun ,name ()
-       (let (the-user time-zone)
+       ;; TODO: We could probably use a macrolet so that accesses to the
+       ;; variables the-user & time-zone signal an error when a session is
+       ;; not valid and authenticated.
+       (let* ((the-user (and (string= (session-value 'authenticated) "yes")
+                             (session-value 'username)
+                             (get-user-obj (session-value 'username))))
+              (time-zone (and the-user (session-value 'timezone))))
          (declare (ignorable the-user time-zone))
+         (no-cache) ; Prevent caching on most browsers.
          ,@body))
      (push (create-prefix-dispatcher ,(format nil "/~(~a~)/" name) ',name)
            *dispatch-table*)))
@@ -82,7 +90,7 @@ BE CAREFUL."
 (defmacro standard-page ((&key (title "")
                                (show-banner t)
                                css-files js-files
-                               (active-tab :listing))
+                               active-tab)
                          &body body)
   `(with-html-output-to-string (*standard-output* nil :prologue t :indent nil)
      (:html
@@ -119,28 +127,32 @@ BE CAREFUL."
            ,(when show-banner
               `(:header :role "banner" :class "banner"
                  (:nav
-                   (:ul (:li ,@(when (eql active-tab :listing) `(:class "current"))
-                             (:a :href "/listing/" "Listings"))
-                        (:li ,@(when (eql active-tab :reports) `(:class "current"))
-                             (:a :href "/reports/" "Reports"))
-                        (:li ,@(when (eql active-tab :community) `(:class "current"))
-                             (:a :href "/community/" "Community"))
-                        (:li ,@(when (eql active-tab :account) `(:class "current"))
-                             (:a :href "/account/" "Account"))
-                        (:li :class "notab"
-                             (:span "Welcome "
-                                    (esc (or (trim-or-nil (user-full-name the-user))
-                                             (user-username the-user)))))
-                        (:li :class "notab" (:a :href "/logout/" "Logout"))))))
+                   (:ul
+                     (:li ,@(when (eql active-tab :listing) `(:class "current"))
+                          (:a :href "/listing/" "Listings"))
+                     (:li ,@(when (eql active-tab :reports) `(:class "current"))
+                          (:a :href "/reports/" "Reports"))
+                     (:li ,@(when (eql active-tab :community) `(:class "current"))
+                          (:a :href "/community/" "Community"))
+                     (:li ,@(when (eql active-tab :account) `(:class "current"))
+                          (:a :href "/account/" "Account"))
+                     (when the-user
+                       (htm
+                         (:li :class "notab"
+                              (:span "Welcome "
+                                     (esc (or (trim-or-nil
+                                                (user-full-name the-user))
+                                              (user-username the-user)))))
+                         (:li :class "notab"
+                              (:a :href "/logout/" "Logout"))))))))
            (:div :id "content"
                  ,@body)
-           ,(when show-banner
-              `(:footer
-                 (:p 
-                   (:a :href "/updates/" "UPDATES") " | "
-                   (:a :href "/about/" "About this") " | "
-                   (:a :href "/credits/" "Credits") " | "
-                   "Powered by Common Lisp"))))))))
+           (:footer
+             (:p
+               (:a :href "/updates/" "UPDATES") " | "
+               (:a :href "/about/" "About this") " | "
+               (:a :href "/credits/" "Credits") " | "
+               "Powered by Common Lisp")))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; QUEUE AND SHOW ERROR/SUCCESS MESSAGES TO THE USER

@@ -382,7 +382,8 @@
     (when (process-add-new-task the-user today)
       (redirect (format nil "/listing/?d=~a" (format-date today))))
     ;; Display form.
-    (standard-page (:title "Add new record")
+    (standard-page (:title "Add new record"
+                    :active-tab :listing)
       (render-add-new-task today (post-parameter "location")))))
 
 (defun render-add-new-task (today location)
@@ -468,7 +469,8 @@
     (when (and task (process-edit-task task the-user))
       (redirect (format nil "/listing/?d=~a"
                         (format-date (parse-iso8601-date (task-date task))))))
-    (standard-page (:title "Add new record")
+    (standard-page (:title "Add new record"
+                    :active-tab :listing)
       (:section :class "add-task"
         (show-all-messages)
         (:header (:h1 "Edit record"))
@@ -933,7 +935,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; FOOTER PAGES
 
-(define-url-fn updates
+(define-open-url-fn updates
   (standard-page (:title "Updates"
                   :active-tab :community)
     (:section :id "updates"
@@ -968,7 +970,7 @@
         (:ul
           (:li "We are live at pomolog.com!"))))))
 
-(define-url-fn about
+(define-open-url-fn about
   (standard-page (:title "About this application"
                   :active-tab :community)
     (:section :id "about"
@@ -1030,7 +1032,7 @@
           \"Business proposition\" or your email will go straight to the
           trash can."))))
 
-(define-url-fn credits
+(define-open-url-fn credits
   (standard-page (:title "Credits"
                   :active-tab :community)
     (:section :id "credits"
