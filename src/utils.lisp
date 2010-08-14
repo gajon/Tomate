@@ -116,7 +116,6 @@ BE CAREFUL."
          ;;
          ;; JavaScript files
          ;;
-         (:script :type "text/javascript" :src "/static/js/jquery-1.4.2.min.js")
          ,@(mapcar (lambda (file)
                      `(:script :type "text/javascript"
                                :src ,(format nil "/static/js/~a" file)))

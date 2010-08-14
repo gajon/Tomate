@@ -87,8 +87,7 @@
   ;; Render login page
   ;;
   (standard-page (:title "Pomolog.com, Record your achievements while using the Pomodoro Technique."
-                  :show-banner nil
-                  :js-files ("login.js"))
+                  :show-banner nil)
     (:div :id "login"
       (:section :id "login-text1"
         ;; Login Form
@@ -168,7 +167,17 @@
         original author and download other resources from its web page:</p>
         <p><a href="http://www.pomodorotechnique.com/">
         http://www.pomodorotechnique.com/</a></p>
-        END_OF_HTML))))
+        END_OF_HTML))
+
+    (:script
+      #>SCRIPT
+      var usernameInput = document.getElementById("id_username");
+      usernameInput.focus();
+      usernameInput.select();
+
+      var timezoneInput = document.getElementById("id_timezone");
+      timezoneInput.value = (new Date()).getTimezoneOffset() / 60;
+      SCRIPT)))
 
       
 
@@ -286,8 +295,10 @@
                     :active-tab :listing
                     :css-files ("tablesorter/blue/style.css"
                                 "jquery-ui-custom-theme/jquery-ui-1.8.2.custom.css")
-                    :js-files ("code.js" "jquery.tablesorter.min.js"
-                               "jquery-ui-1.8.2.custom.min.js"))
+                    :js-files ("jquery-1.4.2.min.js"
+                               "jquery.tablesorter.min.js"
+                               "jquery-ui-1.8.2.custom.min.js"
+                               "code.js"))
       ;;
       ;; DAY NAVIGATION: displays the date, location and links to
       ;; go to the previous/next day.
@@ -382,7 +393,8 @@
       (redirect (format nil "/listing/?d=~a" (format-date today))))
     ;; Display form.
     (standard-page (:title "Add new record"
-                    :active-tab :listing)
+                    :active-tab :listing
+                    :js-files ("jquery-1.4.2.min.js"))
       (render-add-new-task today (post-parameter "location")))))
 
 (defun render-add-new-task (today location)
@@ -670,7 +682,8 @@
   (standard-page (:title "Reports about your data"
                   :active-tab :reports
                   :css-files ("jquery-ui-custom-theme/jquery-ui-1.8.2.custom.css")
-                  :js-files ("jquery-ui-1.8.2.custom.min.js"
+                  :js-files ("jquery-1.4.2.min.js"
+                             "jquery-ui-1.8.2.custom.min.js"
                              "swfobject.js"))
     (:section :id "reports"
       (show-all-messages)
