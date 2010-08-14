@@ -230,15 +230,14 @@
     (:section :id "register-terms"
       (:div (:p (:strong "I promise you this:")))
       (:div (:ul
-              (:li "I'll NEVER use, sell, spy on, trade, or disseminate your
+              (:li "I'll never use, sell, spy on, trade, or disseminate your
                    information. I truly respect your privacy.")
               (:li "You'll always be able to download your records to your
                    computer; your information is yours, and I'll never lock
                    you here.")))
       (:div (:p (:strong "And you promise me this:")))
       (:div (:ul
-              (:li "Don't use the community forums to send unsolicited
-                   information to others (e.g. Spam).")
+              (:li "Don't send unsolicited information to others (e.g. Spam).")
               (:li "Don't attempt to violate the security of this application
                    or do anything with the intention of accessing the
                    information of other users.")
@@ -940,11 +939,10 @@
                   :active-tab :community)
     (:section :id "updates"
       (:h1 "Updates")
-      (:p "If you are a programmer or just curious enough, you can also see
-          the whole source code of this application and the changesets at
-          its Mercurial repository at "
-          (:a :href "http://bitbucket.org/gajon/tomate/changesets"
-              :target "_blank" "http://bitbucket.org/gajon/tomate/changesets"))
+      (:p "You can see the full set of changesets and the source code of
+          this application at its Mercurial repository: "
+          (:a :href "http://bitbucket.org/gajon/tomate"
+              :target "_blank" "http://bitbucket.org/gajon/tomate"))
       (:div :class "updates"
         (:h2 "2010-08-08")
         (:ul
@@ -975,62 +973,55 @@
                   :active-tab :community)
     (:section :id "about"
       (:h1 "About this application")
-      (:p "When I decided to create this little tool I had been using the
-          Pomodoro Technique for about 8 months, and all this time I've only
-          used a notebook, a pen, and a countdown timer on my cellphone.")
+      (:p "I had been using the Pomodoro Technique for eight months when I
+          decided to create this little tool. I've always used a notebook, a
+          pen and a countdown timer on my cellphone.")
 
-      (:p "I was never interested in using a software tool to plan my tasks
-          and estimate pomodoros; I love working with paper and I will
-          continue to do so. But there was a little problem, it's difficult
-          to extract valuable information from your records when they are
-          in paper.")
+      (:p "I never wanted to use a software tool to plan my tasks and
+          estimate pomodoros; I love working with paper and I will continue
+          to do so. But there is a problem, it's difficult to get valuable
+          information from your records when they are only in paper.")
 
       (:p "Hence this tool was born, and the reason of its extremely narrow
-          focus in only recording spent pomodoros.")
+          focus of only recording spent pomodoros.")
 
       (:p "If your are as crazy as me and enjoy working with pen and paper,
-          I hope that this tool is useful to you, and enjoy using it.
-          I'll make three promises to you:")
+          I hope that this tool is useful to you. I'll make three promises
+          to you:")
 
       (:ul
         (:li "I'll keep this tool forever free.")
-        (:li "I'll NEVER use, sell, spy on, trade, or disseminate your
+        (:li "I'll never use, sell, spy on, trade, or disseminate your
              information. I truly respect your privacy.")
         (:li "You'll always be able to download your records to your
              computer; your information is yours, and I'll never lock you
              here."))
-      
+
       (:p "I only request the following from you:")
       (:ul
-        (:li "Don't use the community forums to send unsolicited information
-             to others (e.g. Spam).")
+        (:li "Don't send unsolicited information to others (e.g. Spam).")
         (:li "Don't attempt to violate the security of this application or do
-             anything with the intention of accessing the information of other
-             users.")
+             anything with the intention of accessing other's information.")
         (:li "Be nice to others :)"))
 
-      (:p "I have the right to block any person from accessing this site
-           if he/she is misbehaving.")
-      
       (:h1 "Who is this crazy geek?")
 
-      (:p "I'm a software developer living in Mexico City, and I love:
-          programming, learning new programming languages, dogs, metal music,
-          the Vim editor, Slackware GNU/Linux, and airplanes.")
-
-      (:p "Last November I quitted my last " (:em "formal") " job and have been
-          freelancing since then. Of course with the drastic change in working
-          style I needed to become more aware of how I used my time; that's why
-          I started using the Pomodoro Technique, with great results.")
+      (:p "I'm a software developer living in Mexico City. Last November I
+          quitted my last " (:em "formal") " job and have been freelancing
+          since then. With the drastic change in working style I needed to
+          be more aware of how I used my time; that's why I started
+          using the Pomodoro Technique, with great results.")
 
       (:p "I have a programming related blog at "
           (:a :href "http://gajon.org" :target "_blank" "http://gajon.org")
-          ", which I update on average once a month (or less).")
-
-      (:p "If you want to get in touch you can reach me at gajon@gajon.org,
-          just be careful with the subject line, i.e. don't use a subject like
+          ", and you can reach me via email at gajon@gajon.org; just be
+          careful with the subject line, i.e. don't use a subject like
           \"Business proposition\" or your email will go straight to the
-          trash can."))))
+          trash can.")
+
+      (:p "You can also find me in twitter at: "
+          (:a :href "http://twitter.com/gajon" :target "_blank"
+              "http://twitter.com/gajon")))))
 
 (define-open-url-fn credits
   (standard-page (:title "Credits"
@@ -1048,18 +1039,22 @@
           lets you convert Lisp S-Expressions into (X)HTML code."#)
       (:p #"<a target="_blank" href="http://couchdb.apache.org/">CouchDB</a>
           is a document-oriented database used by this application for data
-          storage and retrieval. To talk to CouchDB from Common Lisp, I use a
+          storage and retrieval. To talk to CouchDB from Common Lisp, I used a
           library by Peter Eddy called <a target="_blank" 
           href="http://common-lisp.net/project/clouchdb/">clouchdb</a>."#)
+      (:p #"There's some JavaScript thrown in there, with the help of
+          <a target="_blank" href="http://jquery.com/">jQuery</a>. And to
+          generate the charts I used the nice <a target="_blank"
+          href="http://teethgrinder.co.uk/open-flash-chart-2/">Open Flash
+          Chart</a> open source tool."#)
       (:p #"My favorite editor is <a target="_blank" href="http://www.vim.org/">
           Vim</a>, which I've been using for years."#)
       (:p #"My operating system of choice is <a href="http://slackware.com/"
           target="_blank">Slackware GNU/Linux</a>, which I use in my workstation
           as well as in the server this application runs on."#)
       (:h1 "This application's source code is available")
-      (:p "If you are a programmer or are curious enough, you can get the
-          complete source code of this application from it's Mercurial
-          repository, located at:")
+      (:p "You can get the complete source code of this application from
+          it's Mercurial repository, located at:")
       (:p (:a :href "http://bitbucket.org/gajon/tomate/" :target "_blank"
               "http://bitbucket.org/gajon/tomate/"))
       (:p "It is released under an MIT license.")

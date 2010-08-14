@@ -532,7 +532,13 @@ section.add-task {
 }
 
 #updates h1, #about h1, #credits h1 { margin-bottom: 0.8em; }
-#updates p { margin-bottom: 2em; color: #666; }
+#updates p {
+	margin-bottom: 2em;
+	color: #666;
+	font-style: italic;
+	font-size: 1.3em;
+	line-height: 1.3;
+}
 #about p   { margin-bottom: 1.5em; width: 60%; }
 #credits p { margin-bottom: 1.5em; }
 
