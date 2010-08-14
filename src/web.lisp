@@ -176,7 +176,19 @@
 
       var timezoneInput = document.getElementById("id_timezone");
       timezoneInput.value = (new Date()).getTimezoneOffset() / 60;
-      SCRIPT)))
+      SCRIPT)
+
+    (:script :type "text/javascript"
+    #>GOOGLEANALYTICS
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17396999-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    GOOGLEANALYTICS)))
 
       
 
@@ -249,7 +261,20 @@
               (:li "Don't attempt to violate the security of this application
                    or do anything with the intention of accessing the
                    information of other users.")
-              (:li "Be nice to others :)"))))))
+              (:li "Be nice to others :)"))))
+
+    (:script :type "text/javascript"
+    #>GOOGLEANALYTICS
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17396999-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    GOOGLEANALYTICS)))
+
 
 (defun process-register-new-account ()
   (let ((username (trim-or-nil (post-parameter "username")))
