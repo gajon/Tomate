@@ -277,7 +277,7 @@ BE CAREFUL."
                  :rows rows
                  :class inputclass
                  :disabled disabled
-        (esc default-value)))))
+        (str default-value)))))
 
 (defun submit-button (label &key (name "submit") disabled)
   (let* ((name (escape-string name))
@@ -289,7 +289,7 @@ BE CAREFUL."
               :value label
               :name name
               :disabled disabled
-              (esc label)))))
+              (str label)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
