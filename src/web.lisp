@@ -72,8 +72,7 @@
   (when (eql :post (request-method*))
     (let ((username (trim-or-nil (post-parameter "username")))
           (password (trim-or-nil (post-parameter "password")))
-          (timezone (parse-int-force-pos-or-zero
-                      (trim-or-nil (post-parameter "timezone")))))
+          (timezone (parse-int-or-force-value (post-parameter "timezone") 6)))
       (if (and (require-fields username password)
                (or (validate-credentials username password)
                    (push-error-msg "The username or password is not valid.")))
@@ -257,8 +256,7 @@
         (location (trim-or-nil (post-parameter "current-location")))
         (password (trim-or-nil (post-parameter "password")))
         (password-confirmation (trim-or-nil (post-parameter "password2")))
-        (timezone (parse-int-force-pos-or-zero
-                    (trim-or-nil (post-parameter "timezone")))))
+        (timezone (parse-int-or-force-value (post-parameter "timezone") 6)))
     (when (and (require-fields username password password-confirmation)
                (or (string= password password-confirmation)
                    (push-error-msg "The password didn't match, try again.")))

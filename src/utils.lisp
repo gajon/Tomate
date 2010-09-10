@@ -392,7 +392,7 @@ and  http://en.wikipedia.org/wiki/ISO_8601"
     (format nil
             "~d-~2,'0d-~2,'0dT~2,'0d:~2,'0d:~2,'0d~a~2,'0d:00"
             year month date hour minute second
-            (if (plusp zone) "-" "+") zone)))
+            (if (plusp zone) "-" "+") (abs zone))))
 
 (defun parse-iso8601-date (date)
   "Parse a date from a string in the following ISO 8601 format
@@ -450,6 +450,19 @@ the input string is NIL as well."
       (when (> (length trimmed) 0)
         trimmed))))
 
+(defun parse-int-or-force-value (str default &key (start 0) (end nil) (radix 10))
+  "Parses an integer from the given string. The string could be NIL or
+contain garbage, in which case the function simply returns the default value
+given as the second parameter. The function accepts the same arguments as
+`parse-integer`, except for :junk-allowed which is always T. There is no
+`pos` return value like in `parse-integer`."
+  (or (and str (parse-integer str
+                              :start start
+                              :end end
+                              :radix radix
+                              :junk-allowed t))
+      default))
+
 (defun parse-int-force-pos-or-zero (string &key (start 0) (end nil) (radix 10))
   "Parses an integer from the given string. The string could be NIL or contain
 garbage, in which case the function will simply return the number zero (0).
@@ -457,12 +470,7 @@ Otherwise, it will parse the string and return the ABSOLUTE VALUE of the
 number. The function accepts the same arguments as `parse-integer`, except for
 :junk-allowed which is always T. There is no `pos` return value like in
 `parse-integer`."
-  (abs (or (parse-integer (or string "0")
-                          :start start
-                          :end end
-                          :radix radix
-                          :junk-allowed t)
-           0)))
+  (abs (parse-int-or-force-value string 0 :start start :end end :radix radix)))
 
 ;(mapcar #'parse-int-force-pos-or-zero
 ;        (list "" nil "haosd" "1" "0" "23" "-12" "-1" "-0"))
