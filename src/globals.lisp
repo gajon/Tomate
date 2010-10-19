@@ -56,7 +56,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; CouchDB Settings
 
-(clouchdb:set-connection :name "tomate")
+(clouchdb:set-connection :db-name "tomate")
 ;;  set-connection &key host db-name protocol port
 ;;                      document-update-fn document-fetch-fn
 
